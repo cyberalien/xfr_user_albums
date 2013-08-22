@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon addon_id="XfRuUserAlbums" title="[xfr] User Albums" version_string="1.0.0 b7" version_id="1000037" url="http://www.xf-russia.ru" install_callback_class="XfRu_UserAlbums_Install" install_callback_method="install" uninstall_callback_class="XfRu_UserAlbums_Install" uninstall_callback_method="uninstall">
+<addon addon_id="XfRuUserAlbums" title="User Albums" version_string="1.0.0 b7" version_id="1000037" url="http://www.xf-russia.ru" install_callback_class="XfRu_UserAlbums_Install" install_callback_method="install" uninstall_callback_class="XfRu_UserAlbums_Install" uninstall_callback_method="uninstall">
   <admin_navigation>
     <navigation navigation_id="useralbums_tools" parent_navigation_id="tools" display_order="3000" link="" admin_permission_id="" debug_only="0" hide_no_children="0"/>
     <navigation navigation_id="useralbums_tools_thumbs" parent_navigation_id="useralbums_tools" display_order="1" link="useralbums-tools/rebuild" admin_permission_id="" debug_only="0" hide_no_children="0"/>
@@ -139,17 +139,19 @@
 {xen:raw $editLink}
 </xen:controlunit>]]></template>
   </admin_templates>
+  <admin_template_modifications/>
   <code_events/>
   <code_event_listeners>
-    <listener event_id="navigation_tabs" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Tab" callback_method="addTab" active="1" description="Listens to navigation_tabs event"/>
-    <listener event_id="template_create" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Template" callback_method="templateCreate" active="1" description="Template create event listener"/>
-    <listener event_id="template_hook" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Template" callback_method="templateHook" active="1" description="Listens to template_hook event"/>
+    <listener event_id="navigation_tabs" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Tab" callback_method="addTab" active="1" hint="" description="Listens to navigation_tabs event"/>
+    <listener event_id="template_create" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Template" callback_method="templateCreate" active="1" hint="" description="Template create event listener"/>
+    <listener event_id="template_hook" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Template" callback_method="templateHook" active="1" hint="" description="Listens to template_hook event"/>
   </code_event_listeners>
   <cron>
     <entry entry_id="XfRu_UA_cleanUp" cron_class="XfRu_UserAlbums_CronEntry_CleanUp" cron_method="runHourlyCleanUp" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["-1"],"minutes":["6"]}]]></entry>
     <entry entry_id="XfRu_UA_updateViews" cron_class="XfRu_UserAlbums_CronEntry_Views" cron_method="runViewUpdate" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["-1"],"minutes":["0","30"]}]]></entry>
   </cron>
   <email_templates/>
+  <email_template_modifications/>
   <optiongroups>
     <group group_id="XfRuUserAlbums" display_order="1000" debug_only="0"/>
     <option option_id="XfRu_UA_albumsPerPage" edit_format="spinbox" data_type="positive_integer" can_backup="1">
@@ -434,6 +436,7 @@ step=5</edit_format_params>
     <phrase title="xfr_useralbums_error_max_images_per_album_count_reached" version_id="1000032" version_string="1.0.0 b2"><![CDATA[You can not upload images since the limit for images per album reached.]]></phrase>
     <phrase title="xfr_useralbums_error_while_saving_images" version_id="100" version_string="1.0.0"><![CDATA[Error while saving images.]]></phrase>
     <phrase title="xfr_useralbums_file_was_not_uploaded" version_id="1000034" version_string="1.0.0 b4"><![CDATA[File was not uploaded]]></phrase>
+    <phrase title="xfr_useralbums_global" version_id="1000037" version_string="1.0.0 b7"><![CDATA[Global]]></phrase>
     <phrase title="xfr_useralbums_go_to_last_image" version_id="100" version_string="1.0.0"><![CDATA[Go to last image]]></phrase>
     <phrase title="xfr_useralbums_images" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Images]]></phrase>
     <phrase title="xfr_useralbums_images_in_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[images in album]]></phrase>
@@ -3597,5 +3600,6 @@ overflow: hidden; zoom: 1;
 	'username={xen:helper username, $user, 'primaryText'}',
 	'title=<a href="{xen:link useralbums/view, $content}">{$content.title}</a>'}]]></template>
   </templates>
+  <public_template_modifications/>
   <bb_code_media_sites/>
 </addon>
