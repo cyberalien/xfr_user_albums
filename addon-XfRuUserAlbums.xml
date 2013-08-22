@@ -872,7 +872,7 @@ step=5</edit_format_params>
 		</span>
 	</div>
 </xen:if>]]></template>
-    <template title="xfr_useralbums_album_list.css" version_id="1000033" version_string="1.0.0 b3"><![CDATA[
+    <template title="xfr_useralbums_album_list.css" version_id="1000037" version_string="1.0.0 b7"><![CDATA[
 .albumList
 {
 	position: relative;
@@ -1275,7 +1275,6 @@ step=5</edit_format_params>
 		float: left;
 		display: block;
 	}
-
 ]]></template>
     <template title="xfr_useralbums_album_list_grid_holder" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_list_grid.css" />
 <xen:require js="js/xfru/useralbums/sprites.js" />
@@ -1832,7 +1831,7 @@ step=5</edit_format_params>
 </div>
 </xen:if>
 ]]></template>
-    <template title="xfr_useralbums_forum_list_latest_images.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.imageList .categoryStrip
+    <template title="xfr_useralbums_forum_list_latest_images.css" version_id="1000037" version_string="1.0.0 b7"><![CDATA[.imageList .categoryStrip
 {
 	{xen:property subHeading}
 
@@ -1941,7 +1940,35 @@ step=5</edit_format_params>
 			.thumbnailHolder .infobar .posterDate
 			{
 				margin-top: 10px;
-			}]]></template>
+			}
+
+<xen:if is="{xen:property enableResponsive}">
+@media (max-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 100'}px)
+{
+	.thumbnailHolder
+	{
+		width: 49%;
+	}
+
+	.thumbnailHolder:last-child
+	{
+		display: none;
+	}
+}
+
+@media (max-width:{xen:property maxResponsiveMediumWidth})
+{
+	.thumbnailHolder
+	{
+		width: 100%;
+	}
+
+	.imageList
+	{
+		display: none;
+	}
+}
+</xen:if>]]></template>
     <template title="xfr_useralbums_forum_list_random_images" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<xen:if hascontent="true">
 <xen:require css="xfr_useralbums_forum_list_latest_images.css" />
 
@@ -2012,7 +2039,7 @@ step=5</edit_format_params>
 	<!--<a class="close"></a>-->
 
 </div>]]></template>
-    <template title="xfr_useralbums_imagebox.css" version_id="1000036" version_string="1.0.0 b6"><![CDATA[
+    <template title="xfr_useralbums_imagebox.css" version_id="1000037" version_string="1.0.0 b7"><![CDATA[
 #LbImageContent
 {
 	border: none;
@@ -2094,12 +2121,28 @@ step=5</edit_format_params>
 		#LbComments #ImageCommentForm .UserAlbumsImageCommentForm
 		{
 			padding-bottom: 5px;
+			position: relative;
+			padding-left: 60px;
 		}
 
-			#LbComments #ImageCommentForm .UserAlbumsImageCommentForm .avatar img
+			#LbComments #ImageCommentForm .UserAlbumsImageCommentForm .avatar
 			{
-				width: 36px;
-				height: 36px;
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: block;
+			}
+
+				#LbComments #ImageCommentForm .UserAlbumsImageCommentForm .avatar img
+				{
+					width: 48px;
+					height: 48px;
+				}
+
+			#LbComments #ImageCommentForm .UserAlbumsImageCommentForm textarea
+			{
+				min-height: 50px;
+				width: 98%;
 			}
 
 		#LbComments #ImageCommentForm .submit
@@ -2140,7 +2183,26 @@ step=5</edit_format_params>
 		height: 40px;
 		background: transparent url('{xen:property imagePath}/xenforo/widgets/ajaxload.info_FFFFFF_facebook.gif') no-repeat center center;
 	}
-]]></template>
+
+#LbImage
+{
+	max-width: 100%;
+}
+
+<xen:if is="{xen:property enableResponsive}">
+@media (max-width:{xen:property maxResponsiveNarrowWidth})
+{
+	#LbComments #ImageCommentForm .UserAlbumsImageCommentForm
+	{
+		padding-left: 0;
+	}
+
+	#LbComments #ImageCommentForm .UserAlbumsImageCommentForm .avatar
+	{
+		display: none;
+	}
+}
+</xen:if>]]></template>
     <template title="xfr_useralbums_imagebox_image_comments" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<xen:if is="{$canPostComments} || {$imageComments}">
 <div class="UserAlbumsImageComments">
 	<h3 class="textHeading larger">{xen:phrase comments}</h3>
@@ -2180,10 +2242,10 @@ step=5</edit_format_params>
 	</li>
 </xen:foreach>
 </ol>]]></template>
-    <template title="xfr_useralbums_images_list.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.albumLikes .likesSummary
-	{
-		{xen:property messageLikesSummary}
-	}
+    <template title="xfr_useralbums_images_list.css" version_id="1000037" version_string="1.0.0 b7"><![CDATA[.albumLikes .likesSummary
+{
+	{xen:property messageLikesSummary}
+}
 
 .CenteredText
 {
@@ -2411,7 +2473,51 @@ step=5</edit_format_params>
 	{
 		float: left;
 		margin-right: 10px;
-	}]]></template>
+	}
+
+<xen:if is="{xen:property enableResponsive}">
+@media (min-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 1000'}px)
+{
+	.thumbnailHolder
+	{
+		width: 19.5%;
+	}
+}
+
+@media (max-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 300'}px)
+{
+	.thumbnailHolder
+	{
+		width: 33.3%;
+	}
+}
+
+@media (max-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 100'}px)
+{
+	.thumbnailHolder
+	{
+		width: 49.5%;
+	}
+}
+
+@media (max-width:{xen:calc '{xen:property maxResponsiveNarrowWidth} + 100'}px)
+{
+	.thumbnailHolder
+	{
+		width: 100%;
+	}
+
+	.descriptionInfo
+	{
+		margin-left: 0;
+	}
+
+	.descriptionUserBlock
+	{
+		display: none;
+	}
+}
+</xen:if>]]></template>
     <template title="xfr_useralbums_image_add_comment_form" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<form action="{xen:link 'useralbums/image-add-comment', $image}" method="post" id="ImageCommentForm" class="xenForm AutoValidator ImageCommentForm">
 	<div class="UserAlbumsImageCommentForm">
 		<xen:avatar user="$visitor" size="s" img="true" />
@@ -3097,7 +3203,7 @@ overflow: hidden; zoom: 1;
     <li><a href="{xen:link useralbums/create}">{xen:phrase xfr_useralbums_create_own_album}</a></li>
     <li><a href="{xen:link useralbums/own}">{xen:phrase xfr_useralbums_view_own_albums}</a></li>
 </ul>]]></template>
-    <template title="xfr_useralbums_list_grid.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.thumbnailList
+    <template title="xfr_useralbums_list_grid.css" version_id="1000037" version_string="1.0.0 b7"><![CDATA[.thumbnailList
 {
 	overflow: hidden; zoom: 1;
 }
@@ -3260,7 +3366,40 @@ overflow: hidden; zoom: 1;
 			font-size: 11px;
 			min-width: 195px;
 		}
-]]></template>
+
+<xen:if is="{xen:property enableResponsive}">
+@media (min-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 500'}px)
+{
+	.thumbnailHolder
+	{
+		width: 24.5%;
+	}
+}
+
+@media (min-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 1000'}px)
+{
+	.thumbnailHolder
+	{
+		width: 19.5%;
+	}
+}
+
+@media (max-width:{xen:calc '{xen:property maxResponsiveWideWidth} + 100'}px)
+{
+	.thumbnailHolder
+	{
+		width: 49.5%;
+	}
+}
+
+@media (max-width:{xen:calc '{xen:property maxResponsiveNarrowWidth} + 100'}px)
+{
+	.thumbnailHolder
+	{
+		width: 100%;
+	}
+}
+</xen:if>]]></template>
     <template title="xfr_useralbums_member_albums_list" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_album_list.css" />
 <xen:title>{xen:phrase xfr_useralbums_xs_albums, 'name={$user.username}'}</xen:title>
 
