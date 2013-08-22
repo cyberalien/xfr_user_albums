@@ -1,0 +1,3601 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="XfRuUserAlbums" title="[xfr] User Albums" version_string="1.0.0 b7" version_id="1000037" url="http://www.xf-russia.ru" install_callback_class="XfRu_UserAlbums_Install" install_callback_method="install" uninstall_callback_class="XfRu_UserAlbums_Install" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="useralbums_tools" parent_navigation_id="tools" display_order="3000" link="" admin_permission_id="" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="useralbums_tools_thumbs" parent_navigation_id="useralbums_tools" display_order="1" link="useralbums-tools/rebuild" admin_permission_id="" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="xfr_acp_useralbums_tools_data_rebuild"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_rebuilding_datas}...</xen:title>
+
+<xen:require js="js/xenforo/cache_rebuild.js" />
+
+<xen:topctrl>
+	<a href="{xen:if $elements.redirect, $elements.redirect, {xen:adminlink index}}" class="button" id="ExitLink"{xen:if "!{$showExitLink}", ' style="display: none"'}>{xen:phrase stop_rebuilding}</a>
+</xen:topctrl>
+
+<xen:form action="{xen:adminlink useralbums-tools/data-rebuild}" class="CacheRebuild">
+
+	<p id="ProgressText">{xen:phrase rebuilding}... <span class="RebuildMessage">{$rebuildMessage}</span> <span class="DetailedMessage">{$detailedMessage}</span></p>
+	<p id="ErrorText" style="display: none">{xen:phrase error_occurred_or_request_stopped}</p>
+
+	<input type="hidden" name="process" value="1" />
+	<xen:foreach loop="$elements" key="$name" value="$value">
+		<input type="hidden" name="{$name}" value="{$value}" />
+	</xen:foreach>
+
+	<input type="submit" class="button" value="{xen:phrase continue_rebuilding}" />
+
+</xen:form>]]></template>
+    <template title="xfr_acp_useralbums_tools_rebuild"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_rebuild_data}</xen:title>
+
+<xen:form action="{xen:adminlink 'useralbums-tools/data-rebuild'}">
+    <h2 class="subHeading">{xen:phrase xfr_useralbums_rebuild_images_counters}</h2>
+    <xen:spinboxunit name="options[batch]" value="50" step="50" min="1" label="{xen:phrase items_to_process_per_page}:" />
+    <xen:textboxunit name="options[delay]" value="0" step="0.1" min="0" size="20" inputclass="number" label="{xen:phrase page_delay_in_seconds}:">
+        <xen:explain>{xen:phrase allows_delay_each_page_load_by_specified_length_of_time}</xen:explain>
+    </xen:textboxunit>
+
+    <xen:submitunit save="{xen:phrase rebuild_now}" />
+    <input type="hidden" name="cache" value="Images" />
+</xen:form>
+
+<xen:form action="{xen:adminlink 'useralbums-tools/data-rebuild'}">
+	<h2 class="subHeading">{xen:phrase xfr_useralbums_rebuild_comments_counters}</h2>
+	<xen:spinboxunit name="options[batch]" value="100" step="50" min="1" label="{xen:phrase items_to_process_per_page}:" />
+	<xen:textboxunit name="options[delay]" value="0" step="0.1" min="0" size="20" inputclass="number" label="{xen:phrase page_delay_in_seconds}:">
+		<xen:explain>{xen:phrase allows_delay_each_page_load_by_specified_length_of_time}</xen:explain>
+	</xen:textboxunit>
+
+	<xen:submitunit save="{xen:phrase rebuild_now}" />
+	<input type="hidden" name="cache" value="Comments" />
+</xen:form>
+
+<xen:form action="{xen:adminlink 'useralbums-tools/data-rebuild'}">
+	<h2 class="subHeading">{xen:phrase xfr_useralbums_rebuild_thumbnails}</h2>
+	<xen:spinboxunit name="options[batch]" value="50" step="50" min="1" label="{xen:phrase items_to_process_per_page}:" />
+	<xen:textboxunit name="options[delay]" value="0" step="0.1" min="0" size="20" inputclass="number" label="{xen:phrase page_delay_in_seconds}:">
+		<xen:explain>{xen:phrase allows_delay_each_page_load_by_specified_length_of_time}</xen:explain>
+	</xen:textboxunit>
+
+	<xen:submitunit save="{xen:phrase rebuild_now}" />
+	<input type="hidden" name="cache" value="Thumbnails" />
+</xen:form>
+
+<xen:form action="{xen:adminlink 'useralbums-tools/data-rebuild'}">
+	<h2 class="subHeading">{xen:phrase xfr_useralbums_rebuild_thumbnail_sprites}</h2>
+	<xen:spinboxunit name="options[batch]" value="50" step="50" min="1" label="{xen:phrase items_to_process_per_page}:" />
+	<xen:textboxunit name="options[delay]" value="0" step="0.1" min="0" size="20" inputclass="number" label="{xen:phrase page_delay_in_seconds}:">
+		<xen:explain>{xen:phrase allows_delay_each_page_load_by_specified_length_of_time}</xen:explain>
+	</xen:textboxunit>
+
+	<xen:submitunit save="{xen:phrase rebuild_now}" />
+	<input type="hidden" name="cache" value="ThumbnailSprites" />
+</xen:form>]]></template>
+    <template title="xfr_useralbums_import_vbulletin_config"><![CDATA[<xen:title>{xen:phrase configure_importer}: {$name}</xen:title>
+
+<xen:form action="{xen:adminlink import/config}">
+	<xen:if is="{$config}">
+		<xen:controlunit label="{xen:phrase mysql_server}:">{$config.db.host}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase mysql_port}:">{$config.db.port}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase mysql_user_name}:">{$config.db.username}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase mysql_password}:">{$config.db.password}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase mysql_database_name}:">{$config.db.dbname}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase table_prefix}:">{$config.db.prefix}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase force_character_set}:">{$config.db.charset}</xen:controlunit>
+		<xen:controlunit label="{xen:phrase xfr_useralbums_archived_import_log}:">{$config.archivedImportLog}</xen:controlunit>
+
+		<input type="hidden" name="config[db][host]" value="{$config.db.host}" />
+		<input type="hidden" name="config[db][port]" value="{$config.db.port}" />
+		<input type="hidden" name="config[db][username]" value="{$config.db.username}" />
+		<input type="hidden" name="config[db][password]" value="{$config.db.password}" />
+		<input type="hidden" name="config[db][dbname]" value="{$config.db.dbname}" />
+		<input type="hidden" name="config[db][prefix]" value="{$config.db.prefix}" />
+		<input type="hidden" name="config[db][charset]" value="{$config.db.charset}" />
+		<input type="hidden" name="config[archivedImportLog]" value="{$config.archivedImportLog}" />
+
+		<xen:if is="{$albumPath}">
+			<div>{xen:phrase xfr_useralbums_albums_being_stored_in_file_system_confirm_path}</div>
+		</xen:if>
+
+		<xen:if is="{$albumPath}">
+			<xen:textboxunit label="{xen:phrase xfr_useralbums_albums_directory}:" name="config[albumPath]" value="{$albumPath}" />
+		</xen:if>
+	<xen:else />
+		<xen:textboxunit label="{xen:phrase mysql_server}:" name="config[db][host]" value="localhost" />
+		<xen:textboxunit label="{xen:phrase mysql_port}:" name="config[db][port]" value="3306" />
+		<xen:textboxunit label="{xen:phrase mysql_user_name}:" name="config[db][username]" value="" />
+		<xen:textboxunit label="{xen:phrase mysql_password}:" name="config[db][password]" value="" autocomplete="off" />
+		<xen:textboxunit label="{xen:phrase mysql_database_name}:" name="config[db][dbname]" value="" />
+		<xen:textboxunit label="{xen:phrase table_prefix}:" name="config[db][prefix]" value="" />
+		<xen:textboxunit label="{xen:phrase force_character_set}:" name="config[db][charset]" value="">
+			<xen:explain>{xen:phrase if_setting_character_set_in_vbulletin_via_config_enter_here}</xen:explain>
+		</xen:textboxunit>
+		<xen:textboxunit label="{xen:phrase xfr_useralbums_archived_import_log}:" name="config[archivedImportLog]" value="">
+			<xen:explain>{xen:phrase xfr_useralbums_enter_archived_import_log_table_from_previous_import}</xen:explain>
+		</xen:textboxunit>
+	</xen:if>
+
+	<xen:submitunit save="{xen:phrase validate_configuration}" />
+
+	<input type="hidden" name="importer" value="{$importer}" />
+</xen:form>]]></template>
+    <template title="xfr_useralbums_option_display_locations"><![CDATA[<xen:controlunit label="{$preparedOption.title}" explain="{xen:raw $preparedOption.explain}">
+
+<xen:checkbox>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_sidebar_latest_albums]" selected="{$value.forum_sidebar_latest_albums}">{xen:phrase xfr_useralbums_latest_albums_on_sidebar}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_sidebar_random_albums]" selected="{$value.forum_sidebar_random_albums}">{xen:phrase xfr_useralbums_random_albums_on_sidebar}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_sidebar_popular_albums]" selected="{$value.forum_sidebar_popular_albums}">{xen:phrase xfr_useralbums_popular_albums_on_sidebar}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_list_latest_images_before]" selected="{$value.forum_list_latest_images_before}">{xen:phrase xfr_useralbums_latest_images_on_forum_list_before_node_list}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_list_latest_images_below]" selected="{$value.forum_list_latest_images_below}">{xen:phrase xfr_useralbums_latest_images_on_forum_list_below_node_list}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_list_random_images_before]" selected="{$value.forum_list_random_images_before}">{xen:phrase xfr_useralbums_random_images_on_forum_list_before_node_list}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][forum_list_random_images_below]" selected="{$value.forum_list_random_images_below}">{xen:phrase xfr_useralbums_random_images_on_forum_list_below_node_list}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][profile_tab]" selected="{$value.profile_tab}">{xen:phrase xfr_useralbums_profile_tab}</xen:option>
+	<xen:option name="{$fieldPrefix}[{$preparedOption.option_id}][member_card]" selected="{$value.member_card}">{xen:phrase xfr_useralbums_member_card}</xen:option>
+</xen:checkbox>
+
+<input type="hidden" name="{$listedFieldName}" value="{$preparedOption.option_id}" />
+{xen:raw $editLink}
+</xen:controlunit>]]></template>
+  </admin_templates>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="navigation_tabs" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Tab" callback_method="addTab" active="1" description="Listens to navigation_tabs event"/>
+    <listener event_id="template_create" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Template" callback_method="templateCreate" active="1" description="Template create event listener"/>
+    <listener event_id="template_hook" execute_order="10" callback_class="XfRu_UserAlbums_EventListener_Template" callback_method="templateHook" active="1" description="Listens to template_hook event"/>
+  </code_event_listeners>
+  <cron>
+    <entry entry_id="XfRu_UA_cleanUp" cron_class="XfRu_UserAlbums_CronEntry_CleanUp" cron_method="runHourlyCleanUp" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["-1"],"minutes":["6"]}]]></entry>
+    <entry entry_id="XfRu_UA_updateViews" cron_class="XfRu_UserAlbums_CronEntry_Views" cron_method="runViewUpdate" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["-1"],"minutes":["0","30"]}]]></entry>
+  </cron>
+  <email_templates/>
+  <optiongroups>
+    <group group_id="XfRuUserAlbums" display_order="1000" debug_only="0"/>
+    <option option_id="XfRu_UA_albumsPerPage" edit_format="spinbox" data_type="positive_integer" can_backup="1">
+      <default_value>12</default_value>
+      <edit_format_params>min=1
+max=100
+step=1</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="30"/>
+    </option>
+    <option option_id="XfRu_UA_albumsPerSidebarBlock" edit_format="spinbox" data_type="positive_integer" can_backup="1">
+      <default_value>5</default_value>
+      <edit_format_params>min=1
+step=1
+max=20</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="31"/>
+    </option>
+    <option option_id="XfRu_UA_albumsPerUser" edit_format="spinbox" data_type="unsigned_integer" can_backup="1">
+      <default_value>20</default_value>
+      <edit_format_params>min=0
+step=1</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="10"/>
+    </option>
+    <option option_id="XfRu_UA_commentsOrder" edit_format="radio" data_type="string" can_backup="1">
+      <default_value>oldest</default_value>
+      <edit_format_params>oldest=Oldest at the top
+newest=Newest at the top</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="500"/>
+    </option>
+    <option option_id="XfRu_UA_descrPreviewLength" edit_format="spinbox" data_type="unsigned_integer" can_backup="1">
+      <default_value>200</default_value>
+      <edit_format_params>min=0
+step=10</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="40"/>
+    </option>
+    <option option_id="XfRu_UA_displayImages" edit_format="spinbox" data_type="positive_integer" can_backup="1">
+      <default_value>3</default_value>
+      <edit_format_params>min=3
+step=1</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="410"/>
+    </option>
+    <option option_id="XfRu_UA_displayLocations" edit_format="template" data_type="array" can_backup="1">
+      <default_value>a:9:{s:27:"forum_sidebar_latest_albums";s:1:"1";s:27:"forum_sidebar_random_albums";b:0;s:28:"forum_sidebar_popular_albums";b:0;s:31:"forum_list_latest_images_before";b:0;s:30:"forum_list_latest_images_below";b:0;s:31:"forum_list_random_images_before";b:0;s:30:"forum_list_random_images_below";b:0;s:11:"profile_tab";s:1:"1";s:11:"member_card";s:1:"1";}</default_value>
+      <edit_format_params>xfr_useralbums_option_display_locations</edit_format_params>
+      <sub_options>forum_sidebar_latest_albums
+forum_sidebar_random_albums
+forum_sidebar_popular_albums
+forum_list_latest_images_before
+forum_list_latest_images_below
+forum_list_random_images_before
+forum_list_random_images_below
+profile_tab
+member_card</sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="400"/>
+    </option>
+    <option option_id="XfRu_UA_emptyAlbumsAtMainList" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>0</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="50"/>
+    </option>
+    <option option_id="XfRu_UA_hideMenuTabToGuests" edit_format="onoff" data_type="string" can_backup="1">
+      <default_value>0</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="60"/>
+    </option>
+    <option option_id="XfRu_UA_imageDimensions" edit_format="template" data_type="array" can_backup="1">
+      <default_value></default_value>
+      <edit_format_params>option_template_attachmentMaxDimensions</edit_format_params>
+      <sub_options>width
+height</sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="200"/>
+    </option>
+    <option option_id="XfRu_UA_imageExtentions" edit_format="textbox" data_type="string" can_backup="1">
+      <default_value>png
+jpg
+jpeg
+jpe
+gif</default_value>
+      <edit_format_params>rows=4</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="110"/>
+    </option>
+    <option option_id="XfRu_UA_imageMaxFileSize" edit_format="spinbox" data_type="unsigned_integer" can_backup="1">
+      <default_value>1024</default_value>
+      <edit_format_params>min=0
+step=128</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="100"/>
+    </option>
+    <option option_id="XfRu_UA_imagesPerAblum" edit_format="spinbox" data_type="unsigned_integer" can_backup="1">
+      <default_value>40</default_value>
+      <edit_format_params>min=0
+step=5</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="20"/>
+    </option>
+    <option option_id="XfRu_UA_listType" edit_format="radio" data_type="string" can_backup="1">
+      <default_value>grid</default_value>
+      <edit_format_params>table=Table view
+grid=Grid view</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="70"/>
+    </option>
+    <option option_id="XfRu_UA_recentCmntsLimit" edit_format="spinbox" data_type="unsigned_integer" can_backup="1">
+      <default_value>10</default_value>
+      <edit_format_params>min=5
+step=1
+max=20</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="35"/>
+    </option>
+    <option option_id="XfRu_UA_swfUpload" edit_format="onoff" data_type="boolean" can_backup="1">
+      <default_value>1</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="300"/>
+    </option>
+    <option option_id="XfRu_UA_thumbDimensions" edit_format="spinbox" data_type="positive_integer" can_backup="1">
+      <default_value>190</default_value>
+      <edit_format_params>min=25
+step=5</edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="XfRuUserAlbums" display_order="210"/>
+    </option>
+  </optiongroups>
+  <permissions>
+    <permission_groups>
+      <permission_group permission_group_id="xfrUserAlbumsPermissions"/>
+    </permission_groups>
+    <permissions>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_ApproveUnapprove" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="70"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_CreateAlbums" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="20"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_CreateGlobalAlbums" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="21"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_DeleteAlbumsByAny" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="40"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_DeleteAlbumsBySelf" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="40"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_DeleteCmntsByAny" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="60"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_DeleteCmntsBySelf" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="80"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_EditAlbumsByAnyone" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="30"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_EditAlbumsBySelf" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="30"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_EditCmntsByAnyone" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="50"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_EditCmntsBySelf" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="70"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_LikeImages" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="50"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_PostCmnts" permission_type="flag" default_value="unset" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="60"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_ViewAlbums" permission_type="flag" default_value="deny" interface_group_id="xfr_UserAlbums_UserPermissions" display_order="1"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_ViewEmptyAlbums" permission_type="flag" depend_permission_id="xfr_UA_ViewAlbums" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="10"/>
+      <permission permission_group_id="xfrUserAlbumsPermissions" permission_id="xfr_UA_ViewPrivateAlbums" permission_type="flag" depend_permission_id="xfr_UA_ViewAlbums" default_value="unset" interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="20"/>
+    </permissions>
+    <interface_groups>
+      <interface_group interface_group_id="xfr_UserAlbums_ModeratorPermissions" display_order="1020"/>
+      <interface_group interface_group_id="xfr_UserAlbums_UserPermissions" display_order="1010"/>
+    </interface_groups>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_useralbums_tools" version_id="1000035" version_string="1.0.0 b5"><![CDATA[[xfr] User Albums Tools]]></phrase>
+    <phrase title="admin_navigation_useralbums_tools_thumbs" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Rebuild Data]]></phrase>
+    <phrase title="cron_entry_XfRu_UA_cleanUp" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums clean up]]></phrase>
+    <phrase title="cron_entry_XfRu_UA_updateViews" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums update view counters]]></phrase>
+    <phrase title="option_group_XfRuUserAlbums" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums]]></phrase>
+    <phrase title="option_group_XfRuUserAlbums_description" version_id="100" version_string="1.0.0"><![CDATA[User albums add-on settings]]></phrase>
+    <phrase title="option_XfRu_UA_albumsPerPage" version_id="100" version_string="1.0.0"><![CDATA[Albums Per Page]]></phrase>
+    <phrase title="option_XfRu_UA_albumsPerPage_explain" version_id="100" version_string="1.0.0"><![CDATA[This controls the maximum number of albums that will be shown on one page.]]></phrase>
+    <phrase title="option_XfRu_UA_albumsPerSidebarBlock" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Albums Per Sidebar Block]]></phrase>
+    <phrase title="option_XfRu_UA_albumsPerSidebarBlock_explain" version_id="1000036" version_string="1.0.0 b6"><![CDATA[]]></phrase>
+    <phrase title="option_XfRu_UA_albumsPerUser" version_id="100" version_string="1.0.0"><![CDATA[Albums Per User]]></phrase>
+    <phrase title="option_XfRu_UA_albumsPerUser_explain" version_id="100" version_string="1.0.0"><![CDATA[How many albums can user create. Set 0 to allow user create an unlimited amount of albums.]]></phrase>
+    <phrase title="option_XfRu_UA_commentsOrder" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Comments order]]></phrase>
+    <phrase title="option_XfRu_UA_commentsOrder_explain" version_id="1000032" version_string="1.0.0 b2"><![CDATA[]]></phrase>
+    <phrase title="option_XfRu_UA_descrPreviewLength" version_id="100" version_string="1.0.0"><![CDATA[Album Description Preview Length]]></phrase>
+    <phrase title="option_XfRu_UA_descrPreviewLength_explain" version_id="100" version_string="1.0.0"><![CDATA[The number of characters that will be used to create the album preview when hovering over the title. Use 0 to disable the preview.]]></phrase>
+    <phrase title="option_XfRu_UA_displayImages" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Display Images]]></phrase>
+    <phrase title="option_XfRu_UA_displayImages_explain" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Set images count you want to display in latest images block and random images block.]]></phrase>
+    <phrase title="option_XfRu_UA_displayLocations" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Display Locations]]></phrase>
+    <phrase title="option_XfRu_UA_displayLocations_explain" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Select available locations you want information to appear that is outside of the albums area.]]></phrase>
+    <phrase title="option_XfRu_UA_emptyAlbumsAtMainList" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Show empty albums at main album list]]></phrase>
+    <phrase title="option_XfRu_UA_emptyAlbumsAtMainList_explain" version_id="1000032" version_string="1.0.0 b2"><![CDATA[If this option enabled, users, who have permissions to see empty albums, will see empty albums at main album list.]]></phrase>
+    <phrase title="option_XfRu_UA_hideMenuTabToGuests" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Hide menu tab form guests]]></phrase>
+    <phrase title="option_XfRu_UA_hideMenuTabToGuests_explain" version_id="1000032" version_string="1.0.0 b2"><![CDATA[You can hide menu tab from guests by enabling this option, even if guests have permission to view albums.]]></phrase>
+    <phrase title="option_XfRu_UA_imageDimensions" version_id="100" version_string="1.0.0"><![CDATA[Maximum Image Dimensions]]></phrase>
+    <phrase title="option_XfRu_UA_imageDimensions_explain" version_id="100" version_string="1.0.0"><![CDATA[The maximum allowed dimensions for uploaded images (width x height). Use 0 or blank to not restrict dimensions.]]></phrase>
+    <phrase title="option_XfRu_UA_imageExtentions" version_id="100" version_string="1.0.0"><![CDATA[Allowed Images File Extensions]]></phrase>
+    <phrase title="option_XfRu_UA_imageExtentions_explain" version_id="100" version_string="1.0.0"><![CDATA[List the file extensions that are allowed to be uploaded. Use spaces or line break between extensions.]]></phrase>
+    <phrase title="option_XfRu_UA_imageMaxFileSize" version_id="100" version_string="1.0.0"><![CDATA[Max Image File Size (KB)]]></phrase>
+    <phrase title="option_XfRu_UA_imageMaxFileSize_explain" version_id="100" version_string="1.0.0"><![CDATA[Provide the maximum image file size in kilobytes (KB). Images over this size will be rejected.]]></phrase>
+    <phrase title="option_XfRu_UA_imagesPerAblum" version_id="100" version_string="1.0.0"><![CDATA[Images Per Album]]></phrase>
+    <phrase title="option_XfRu_UA_imagesPerAblum_explain" version_id="100" version_string="1.0.0"><![CDATA[How many images can be uploaded into album. Set 0 to allow an unlimited amount of images.]]></phrase>
+    <phrase title="option_XfRu_UA_listType" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Album list type]]></phrase>
+    <phrase title="option_XfRu_UA_listType_explain" version_id="1000032" version_string="1.0.0 b2"><![CDATA[You can select table or grid album list type here.]]></phrase>
+    <phrase title="option_XfRu_UA_recentCmntsLimit" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Recent Comment Limit]]></phrase>
+    <phrase title="option_XfRu_UA_recentCmntsLimit_explain" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Controls how many recent comment links are displayed.]]></phrase>
+    <phrase title="option_XfRu_UA_swfUpload" version_id="100" version_string="1.0.0"><![CDATA[Use Flash Uploader]]></phrase>
+    <phrase title="option_XfRu_UA_swfUpload_explain" version_id="100" version_string="1.0.0"><![CDATA[Using the Flash uploader allows those visitors with Adobe Flash installed to select multiple files to upload once, and to see a progress meter during the upload.]]></phrase>
+    <phrase title="option_XfRu_UA_thumbDimensions" version_id="100" version_string="1.0.0"><![CDATA[Image Thumbnail Dimensions]]></phrase>
+    <phrase title="option_XfRu_UA_thumbDimensions_explain" version_id="100" version_string="1.0.0"><![CDATA[The maximum width and height of generated image thumbnails.]]></phrase>
+    <phrase title="permission_group_xfrUserAlbumsPermissions" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums Permissions]]></phrase>
+    <phrase title="permission_interface_xfr_UserAlbums_ModeratorPermissions" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums - Moderator Permissions]]></phrase>
+    <phrase title="permission_interface_xfr_UserAlbums_UserPermissions" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums - User Permissions]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_ApproveUnapprove" version_id="100" version_string="1.0.0"><![CDATA[Approve / unapprove albums / images]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_CreateAlbums" version_id="100" version_string="1.0.0"><![CDATA[Create albums]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_CreateGlobalAlbums" version_id="1000037" version_string="1.0.0 b7"><![CDATA[Create global albums]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_DeleteAlbumsByAny" version_id="100" version_string="1.0.0"><![CDATA[Delete albums by anyone]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_DeleteAlbumsBySelf" version_id="100" version_string="1.0.0"><![CDATA[Delete albums by self]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_DeleteCmntsByAny" version_id="100" version_string="1.0.0"><![CDATA[Delete comments by anyone]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_DeleteCmntsBySelf" version_id="100" version_string="1.0.0"><![CDATA[Delete comments by self]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_EditAlbumsByAnyone" version_id="100" version_string="1.0.0"><![CDATA[Edit albums by anyone]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_EditAlbumsBySelf" version_id="100" version_string="1.0.0"><![CDATA[Edit albums by self]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_EditCmntsByAnyone" version_id="100" version_string="1.0.0"><![CDATA[Edit comments by anyone]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_EditCmntsBySelf" version_id="100" version_string="1.0.0"><![CDATA[Edit comments by self]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_LikeImages" version_id="100" version_string="1.0.0"><![CDATA[Like images]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_PostCmnts" version_id="100" version_string="1.0.0"><![CDATA[Post comments]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_ViewAlbums" version_id="100" version_string="1.0.0"><![CDATA[View albums]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_ViewEmptyAlbums" version_id="100" version_string="1.0.0"><![CDATA[View empty albums]]></phrase>
+    <phrase title="permission_xfrUserAlbumsPermissions_xfr_UA_ViewPrivateAlbums" version_id="100" version_string="1.0.0"><![CDATA[View private albums]]></phrase>
+    <phrase title="style_property_albumListCoverImage_description_master" version_id="100" version_string="1.0.0"><![CDATA[Controls the appearance of the cover image of the album.]]></phrase>
+    <phrase title="style_property_albumListCoverImage_master" version_id="100" version_string="1.0.0"><![CDATA[Album Cover Image]]></phrase>
+    <phrase title="style_property_albumListCoverWidth_description_master" version_id="100" version_string="1.0.0"><![CDATA[Controls the width of the album cover cell.]]></phrase>
+    <phrase title="style_property_albumListCoverWidth_master" version_id="100" version_string="1.0.0"><![CDATA[Album Cover Cell Width]]></phrase>
+    <phrase title="style_property_albumListLastImageWidth_description_master" version_id="100" version_string="1.0.0"><![CDATA[]]></phrase>
+    <phrase title="style_property_albumListLastImageWidth_master" version_id="100" version_string="1.0.0"><![CDATA[Last Image Cell Width]]></phrase>
+    <phrase title="style_property_albumListStatsWidth_description_master" version_id="100" version_string="1.0.0"><![CDATA[Controls the width of the statistics cell.]]></phrase>
+    <phrase title="style_property_albumListStatsWidth_master" version_id="100" version_string="1.0.0"><![CDATA[Stats Cell Width]]></phrase>
+    <phrase title="style_property_albumNoCoverIconPath_description_master" version_id="100" version_string="1.0.0"><![CDATA[Path the the icon shown if album has no cover image.]]></phrase>
+    <phrase title="style_property_albumNoCoverIconPath_master" version_id="100" version_string="1.0.0"><![CDATA[Default Cover Icon Path]]></phrase>
+    <phrase title="style_property_descriptionContent_description_master" version_id="100" version_string="1.0.0"><![CDATA[This is used to enclose the description text.]]></phrase>
+    <phrase title="style_property_descriptionContent_master" version_id="100" version_string="1.0.0"><![CDATA[Description Content]]></phrase>
+    <phrase title="style_property_descriptionInfo_description_master" version_id="100" version_string="1.0.0"><![CDATA[This element contains the content area of the album or image description.]]></phrase>
+    <phrase title="style_property_descriptionInfo_master" version_id="100" version_string="1.0.0"><![CDATA[Description Container]]></phrase>
+    <phrase title="style_property_gridViewModerated_description_master" version_id="1000033" version_string="1.0.0 b3"><![CDATA[This styles thumbnail holder for moderated albums in grid layout.]]></phrase>
+    <phrase title="style_property_gridViewModerated_master" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Grid view: Moderated]]></phrase>
+    <phrase title="style_property_gridViewPrivate_description_master" version_id="1000033" version_string="1.0.0 b3"><![CDATA[This styles thumbnail holder for private albums in grid layout.]]></phrase>
+    <phrase title="style_property_gridViewPrivate_master" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Grid view: Private]]></phrase>
+    <phrase title="style_property_group_xfr_useralbums_master" version_id="100" version_string="1.0.0"><![CDATA[[xfr] User Albums]]></phrase>
+    <phrase title="style_property_group_xfr_useralbums_master_desc" version_id="100" version_string="1.0.0"><![CDATA[Styles different elements of user albums pages]]></phrase>
+    <phrase title="xfr_useralbums" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Albums]]></phrase>
+    <phrase title="xfr_useralbums_add_delete_images" version_id="100" version_string="1.0.0"><![CDATA[Manage Images]]></phrase>
+    <phrase title="xfr_useralbums_album" version_id="100" version_string="1.0.0"><![CDATA[Album]]></phrase>
+    <phrase title="xfr_useralbums_albums_being_stored_in_file_system_confirm_path" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Albums are being stored in file system. Please confirm the path to these.]]></phrase>
+    <phrase title="xfr_useralbums_albums_count" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Albums count]]></phrase>
+    <phrase title="xfr_useralbums_albums_directory" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Albums directory]]></phrase>
+    <phrase title="xfr_useralbums_albums_directory_not_found" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Albums directory not found.]]></phrase>
+    <phrase title="xfr_useralbums_album_by" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Album by]]></phrase>
+    <phrase title="xfr_useralbums_album_created_by_x_date_y" version_id="100" version_string="1.0.0"><![CDATA[Album created by {name}, {date}.]]></phrase>
+    <phrase title="xfr_useralbums_album_has_been_deleted" version_id="100" version_string="1.0.0"><![CDATA[Album has been deleted.]]></phrase>
+    <phrase title="xfr_useralbums_album_images" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Album images]]></phrase>
+    <phrase title="xfr_useralbums_album_likes" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Album likes]]></phrase>
+    <phrase title="xfr_useralbums_album_owner" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Album author]]></phrase>
+    <phrase title="xfr_useralbums_album_tools" version_id="100" version_string="1.0.0"><![CDATA[Album Tools]]></phrase>
+    <phrase title="xfr_useralbums_album_type" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Album Type]]></phrase>
+    <phrase title="xfr_useralbums_album_views" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Album views]]></phrase>
+    <phrase title="xfr_useralbums_album_x_by_y" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Album '{title}' by {name}]]></phrase>
+    <phrase title="xfr_useralbums_alert_image_comment" version_id="1000031" version_string="1.0.0 b1"><![CDATA[{user} has posted a comment on your image in the album <a href="{link}"  class="PopupItemLink">{title}</a>.]]></phrase>
+    <phrase title="xfr_useralbums_alert_image_comment_someone_comments" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{user} has posted a comment on the image you have commented too in the album <a href="{link}"  class="PopupItemLink">{title}</a>.]]></phrase>
+    <phrase title="xfr_useralbums_also_comments_on_a_image" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Also comments on a image]]></phrase>
+    <phrase title="xfr_useralbums_archived_import_log" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Archived Import Log]]></phrase>
+    <phrase title="xfr_useralbums_archived_import_log_not_entered" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Archived import log table name not entered.]]></phrase>
+    <phrase title="xfr_useralbums_closed_for_moderation" version_id="100" version_string="1.0.0"><![CDATA[Closed for moderation purposes.]]></phrase>
+    <phrase title="xfr_useralbums_comments" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Comments]]></phrase>
+    <phrase title="xfr_useralbums_comments_on_your_album_image" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Comments on your image]]></phrase>
+    <phrase title="xfr_useralbums_comment_report_title" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Reported image comment from album]]></phrase>
+    <phrase title="xfr_useralbums_create_album" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Create Album]]></phrase>
+    <phrase title="xfr_useralbums_create_own_album" version_id="100" version_string="1.0.0"><![CDATA[Create Own Album]]></phrase>
+    <phrase title="xfr_useralbums_creating_album" version_id="100" version_string="1.0.0"><![CDATA[Creating album]]></phrase>
+    <phrase title="xfr_useralbums_delete_album" version_id="100" version_string="1.0.0"><![CDATA[Delete Album]]></phrase>
+    <phrase title="xfr_useralbums_delete_album_x" version_id="100" version_string="1.0.0"><![CDATA[Delete album '{title}']]></phrase>
+    <phrase title="xfr_useralbums_delete_comment" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Delete comment]]></phrase>
+    <phrase title="xfr_useralbums_delete_comment_by_x" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Delete comment by {user}]]></phrase>
+    <phrase title="xfr_useralbums_delete_image" version_id="100" version_string="1.0.0"><![CDATA[Delete image]]></phrase>
+    <phrase title="xfr_useralbums_delete_image_by_x" version_id="100" version_string="1.0.0"><![CDATA[Delete image by user {user}]]></phrase>
+    <phrase title="xfr_useralbums_editing_album" version_id="100" version_string="1.0.0"><![CDATA[Editing album]]></phrase>
+    <phrase title="xfr_useralbums_edit_album" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Edit Album]]></phrase>
+    <phrase title="xfr_useralbums_edit_description" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Edit description]]></phrase>
+    <phrase title="xfr_useralbums_edit_image_by_user" version_id="100" version_string="1.0.0"><![CDATA[Edit image by user {user}]]></phrase>
+    <phrase title="xfr_useralbums_edit_image_comment_by_user" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Edit image comment by {user}]]></phrase>
+    <phrase title="xfr_useralbums_enter_archived_import_log_table_from_previous_import" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Enter archived import log table name from previous import.]]></phrase>
+    <phrase title="xfr_useralbums_error_max_album_count_reached" version_id="100" version_string="1.0.0"><![CDATA[You can not create a new album since the album limit for a single user reached.]]></phrase>
+    <phrase title="xfr_useralbums_error_max_images_per_album_count_reached" version_id="1000032" version_string="1.0.0 b2"><![CDATA[You can not upload images since the limit for images per album reached.]]></phrase>
+    <phrase title="xfr_useralbums_error_while_saving_images" version_id="100" version_string="1.0.0"><![CDATA[Error while saving images.]]></phrase>
+    <phrase title="xfr_useralbums_file_was_not_uploaded" version_id="1000034" version_string="1.0.0 b4"><![CDATA[File was not uploaded]]></phrase>
+    <phrase title="xfr_useralbums_go_to_last_image" version_id="100" version_string="1.0.0"><![CDATA[Go to last image]]></phrase>
+    <phrase title="xfr_useralbums_images" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Images]]></phrase>
+    <phrase title="xfr_useralbums_images_in_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[images in album]]></phrase>
+    <phrase title="xfr_useralbums_image_cannot_be_shown_at_this_time" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Image cannot be shown at this time.]]></phrase>
+    <phrase title="xfr_useralbums_image_comments" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Image comments]]></phrase>
+    <phrase title="xfr_useralbums_image_could_not_be_read_by_server" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Image could not be read by server.]]></phrase>
+    <phrase title="xfr_useralbums_image_from_album_x_by_y" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Image from album '{album}' by {name}]]></phrase>
+    <phrase title="xfr_useralbums_image_likes" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Image likes]]></phrase>
+    <phrase title="xfr_useralbums_image_report_title" version_id="100" version_string="1.0.0"><![CDATA[Image from the album '{title}']]></phrase>
+    <phrase title="xfr_useralbums_image_tools" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Image Tools]]></phrase>
+    <phrase title="xfr_useralbums_image_views" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Image views]]></phrase>
+    <phrase title="xfr_useralbums_image_x_of_y" version_id="100" version_string="1.0.0"><![CDATA[Image {current} of {total}]]></phrase>
+    <phrase title="xfr_useralbums_last_image" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Last image]]></phrase>
+    <phrase title="xfr_useralbums_latest_albums_on_sidebar" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Latest albums on the forum sidebar]]></phrase>
+    <phrase title="xfr_useralbums_latest_images" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Latest images]]></phrase>
+    <phrase title="xfr_useralbums_latest_images_on_forum_list_before_node_list" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Latest images before forum list]]></phrase>
+    <phrase title="xfr_useralbums_latest_images_on_forum_list_below_node_list" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Latest images below forum list]]></phrase>
+    <phrase title="xfr_useralbums_likes_your_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[Likes your album]]></phrase>
+    <phrase title="xfr_useralbums_likes_your_image" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Likes your image]]></phrase>
+    <phrase title="xfr_useralbums_like_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[Like Album]]></phrase>
+    <phrase title="xfr_useralbums_like_image" version_id="100" version_string="1.0.0"><![CDATA[Like Image]]></phrase>
+    <phrase title="xfr_useralbums_members_who_liked_this_album" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Members who liked this album]]></phrase>
+    <phrase title="xfr_useralbums_members_who_liked_this_image" version_id="100" version_string="1.0.0"><![CDATA[Members who liked this image]]></phrase>
+    <phrase title="xfr_useralbums_member_card" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Member card]]></phrase>
+    <phrase title="xfr_useralbums_most_active_users" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Most Active Members]]></phrase>
+    <phrase title="xfr_useralbums_news_feed_item_album_create" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{username} created a new album.]]></phrase>
+    <phrase title="xfr_useralbums_news_feed_item_comment_insert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{username} commented on the image in the album {album}.]]></phrase>
+    <phrase title="xfr_useralbums_news_feed_item_image_insert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{username} added {newImages} new image(s) to his album {album}.]]></phrase>
+    <phrase title="xfr_useralbums_next_image" version_id="100" version_string="1.0.0"><![CDATA[Next Image]]></phrase>
+    <phrase title="xfr_useralbums_no_one_has_liked_this_album_yet" version_id="1000036" version_string="1.0.0 b6"><![CDATA[No one has liked this album yet.]]></phrase>
+    <phrase title="xfr_useralbums_no_one_has_liked_this_image_yet" version_id="100" version_string="1.0.0"><![CDATA[No one has liked this image yet.]]></phrase>
+    <phrase title="xfr_useralbums_no_permission_to_create_album" version_id="100" version_string="1.0.0"><![CDATA[(no permission to create album)]]></phrase>
+    <phrase title="xfr_useralbums_please_enter_reason_for_reporting_this_comment" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Please enter reason for reporting this comment.]]></phrase>
+    <phrase title="xfr_useralbums_please_enter_reason_for_reporting_this_image" version_id="100" version_string="1.0.0"><![CDATA[Please, enter reason for reporting this image.]]></phrase>
+    <phrase title="xfr_useralbums_popular_albums_on_sidebar" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Popular albums on the forum sidebar]]></phrase>
+    <phrase title="xfr_useralbums_previous_image" version_id="100" version_string="1.0.0"><![CDATA[Previous Image]]></phrase>
+    <phrase title="xfr_useralbums_private" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Private]]></phrase>
+    <phrase title="xfr_useralbums_profile_tab" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Profile Tab]]></phrase>
+    <phrase title="xfr_useralbums_public" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Public]]></phrase>
+    <phrase title="xfr_useralbums_random_albums_on_sidebar" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Random albums on the forum sidebar]]></phrase>
+    <phrase title="xfr_useralbums_random_images" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Random images]]></phrase>
+    <phrase title="xfr_useralbums_random_images_on_forum_list_before_node_list" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Random images before forum list]]></phrase>
+    <phrase title="xfr_useralbums_random_images_on_forum_list_below_node_list" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Random images below forum list]]></phrase>
+    <phrase title="xfr_useralbums_rebuilding_datas" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Rebuilding Datas]]></phrase>
+    <phrase title="xfr_useralbums_rebuild_comments_counters" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Rebuild Comment Counters]]></phrase>
+    <phrase title="xfr_useralbums_rebuild_data" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Rebuild Data]]></phrase>
+    <phrase title="xfr_useralbums_rebuild_images_counters" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Rebuild images counters]]></phrase>
+    <phrase title="xfr_useralbums_rebuild_thumbnails" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Rebuild Thumbnails]]></phrase>
+    <phrase title="xfr_useralbums_rebuild_thumbnail_sprites" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Rebuild Thumbnail Sprites]]></phrase>
+    <phrase title="xfr_useralbums_recent_comments" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Recent Comments]]></phrase>
+    <phrase title="xfr_useralbums_report_comment" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Report comment]]></phrase>
+    <phrase title="xfr_useralbums_report_image" version_id="100" version_string="1.0.0"><![CDATA[Report image]]></phrase>
+    <phrase title="xfr_useralbums_requested_album_not_found" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Requested album not found.]]></phrase>
+    <phrase title="xfr_useralbums_requested_comment_not_found" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Requested comment not found.]]></phrase>
+    <phrase title="xfr_useralbums_requested_image_not_found" version_id="100" version_string="1.0.0"><![CDATA[Requested image not found.]]></phrase>
+    <phrase title="xfr_useralbums_set_album_status" version_id="100" version_string="1.0.0"><![CDATA[Set Album Status]]></phrase>
+    <phrase title="xfr_useralbums_show_all_albums_by_x" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Show all albums by {name}]]></phrase>
+    <phrase title="xfr_useralbums_sidebar_latest_albums" global_cache="1" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Latest Albums]]></phrase>
+    <phrase title="xfr_useralbums_sidebar_popualr_albums" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Popular Albums]]></phrase>
+    <phrase title="xfr_useralbums_sidebar_random_albums" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Random Albums]]></phrase>
+    <phrase title="xfr_useralbums_someone_comments_on_a_image_that_you_have_commented_on" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Someone comments on a image that you have commented on]]></phrase>
+    <phrase title="xfr_useralbums_someone_likes_your_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[Someone likes your album]]></phrase>
+    <phrase title="xfr_useralbums_someone_likes_your_image" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Someone likes your image]]></phrase>
+    <phrase title="xfr_useralbums_someone_posts_a_comment_on_one_of_your_album_images" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Someone posts a comment on one of your images]]></phrase>
+    <phrase title="xfr_useralbums_sorry_you_have_no_permission_to_create_album" version_id="100" version_string="1.0.0"><![CDATA[Sorry, you have no permission to create album.]]></phrase>
+    <phrase title="xfr_useralbums_statistics" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Statistics]]></phrase>
+    <phrase title="xfr_useralbums_stats" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[Statistics]]></phrase>
+    <phrase title="xfr_useralbums_stats_albums" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Albums]]></phrase>
+    <phrase title="xfr_useralbums_stats_album_owners" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Album Owners]]></phrase>
+    <phrase title="xfr_useralbums_stats_comments" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Comments]]></phrase>
+    <phrase title="xfr_useralbums_stats_images" version_id="1000033" version_string="1.0.0 b3"><![CDATA[Images]]></phrase>
+    <phrase title="xfr_useralbums_thank_you_for_reporting_this_comment" version_id="1000031" version_string="1.0.0 b1"><![CDATA[Thank you for reporting this comment.]]></phrase>
+    <phrase title="xfr_useralbums_thank_you_for_reporting_this_image" version_id="100" version_string="1.0.0"><![CDATA[Thank you for reporting this image]]></phrase>
+    <phrase title="xfr_useralbums_there_are_no_albums_yet" version_id="100" version_string="1.0.0"><![CDATA[There are no albums yet.]]></phrase>
+    <phrase title="xfr_useralbums_there_are_no_images_yet" version_id="100" version_string="1.0.0"><![CDATA[There are no images yet in this album.]]></phrase>
+    <phrase title="xfr_useralbums_this_album_is_awaiting_moderator_approval" version_id="1000033" version_string="1.0.0 b3"><![CDATA[This album is awaiting moderator approval and is invisible to normal visitors.]]></phrase>
+    <phrase title="xfr_useralbums_this_is_a_private_album" version_id="1000033" version_string="1.0.0 b3"><![CDATA[This is a private album.]]></phrase>
+    <phrase title="xfr_useralbums_thumbnails" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Thumbnails]]></phrase>
+    <phrase title="xfr_useralbums_thumbnail_sprites" version_id="1000035" version_string="1.0.0 b5"><![CDATA[Thumbnail Sprites]]></phrase>
+    <phrase title="xfr_useralbums_unapprove_image" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Unnaprove Image]]></phrase>
+    <phrase title="xfr_useralbums_unlike_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[Unlike Album]]></phrase>
+    <phrase title="xfr_useralbums_unlike_image" version_id="100" version_string="1.0.0"><![CDATA[Unlike Image]]></phrase>
+    <phrase title="xfr_useralbums_uploaded_images" version_id="100" version_string="1.0.0"><![CDATA[Uploaded images]]></phrase>
+    <phrase title="xfr_useralbums_user1_liked_user2s_image" version_id="100" version_string="1.0.0"><![CDATA[{name} liked <a {posterParams}>{poster}'s</a> image in the album {title}.]]></phrase>
+    <phrase title="xfr_useralbums_user_albums" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[User Albums]]></phrase>
+    <phrase title="xfr_useralbums_user_has_no_albums_yet" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[User has no albums yet.]]></phrase>
+    <phrase title="xfr_useralbums_user_liked_your_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[{username} liked your album {title}.]]></phrase>
+    <phrase title="xfr_useralbums_user_liked_your_image" version_id="100" version_string="1.0.0"><![CDATA[{username} liked your image in the album {title}.]]></phrase>
+    <phrase title="xfr_useralbums_viewing_album" version_id="100" version_string="1.0.0"><![CDATA[Viewing album]]></phrase>
+    <phrase title="xfr_useralbums_viewing_albums_list" version_id="100" version_string="1.0.0"><![CDATA[Viewing albums list]]></phrase>
+    <phrase title="xfr_useralbums_viewing_album_image" version_id="100" version_string="1.0.0"><![CDATA[Viewing album image]]></phrase>
+    <phrase title="xfr_useralbums_view_own_albums" version_id="100" version_string="1.0.0"><![CDATA[View own albums]]></phrase>
+    <phrase title="xfr_useralbums_view_own_albums_list" version_id="100" version_string="1.0.0"><![CDATA[Viewing own albums list]]></phrase>
+    <phrase title="xfr_useralbums_view_xs_albums" version_id="100" version_string="1.0.0"><![CDATA[View {name}'s albums]]></phrase>
+    <phrase title="xfr_useralbums_write_a_comment" version_id="1000032" version_string="1.0.0 b2"><![CDATA[Write a comment]]></phrase>
+    <phrase title="xfr_useralbums_xs_albums" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[{name}'s Albums]]></phrase>
+    <phrase title="xfr_useralbums_x_liked_your_album_y" version_id="1000036" version_string="1.0.0 b6"><![CDATA[{name} liked your album {title}.]]></phrase>
+    <phrase title="xfr_useralbums_x_liked_ys_album__z" version_id="1000036" version_string="1.0.0 b6"><![CDATA[{name} liked <a {posterParams}>{poster}'s album</a> {title}.]]></phrase>
+    <phrase title="xfr_useralbums_your_comment_has_been_posted" version_id="1000036" version_string="1.0.0 b6"><![CDATA[Your comment has been posted.]]></phrase>
+    <phrase title="xfr_useralbums_your_images_were_uploaded_and_saved" version_id="100" version_string="1.0.0"><![CDATA[Your images were uploaded and saved.]]></phrase>
+    <phrase title="xfr_useralbums_you_have_no_albums_yet_create_one" global_cache="1" version_id="100" version_string="1.0.0"><![CDATA[You have no albums yet, but you can <a href={link}>create</a> a new one.]]></phrase>
+    <phrase title="xfr_useralbums_you_may_not_upload_more_images_to_album" version_id="100" version_string="1.0.0"><![CDATA[You may not upload more images to this album.]]></phrase>
+    <phrase title="xfr_useralbums_you_must_upload_at_least_one_image" version_id="100" version_string="1.0.0"><![CDATA[You must upload at least one image.]]></phrase>
+    <phrase title="xfr_useralbums_you_sure_you_want_to_like_this_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[Are you sure you want to like this album?]]></phrase>
+    <phrase title="xfr_useralbums_you_sure_you_want_to_like_this_image" version_id="100" version_string="1.0.0"><![CDATA[Are you sure you want to like this image?]]></phrase>
+    <phrase title="xfr_useralbums_you_sure_you_want_to_unlike_this_album" version_id="1000034" version_string="1.0.0 b4"><![CDATA[Are you sure you want to unlike this album?]]></phrase>
+    <phrase title="xfr_useralbums_you_sure_you_want_to_unlike_this_image" version_id="100" version_string="1.0.0"><![CDATA[Are you sure you want to unlike this image?]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="useralbums-tools" class="XfRu_UserAlbums_Route_PrefixAdmin_Tools" build_link="data_only"/>
+    </route_type>
+    <route_type type="public">
+      <prefix original_prefix="useralbums" class="XfRu_UserAlbums_Route_Prefix_UserAlbums" build_link="data_only"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties>
+    <property property_name="albumListCoverWidth" property_type="scalar" definition="1" group_name="xfr_useralbums" title="Album Cover Cell Width" description="Controls the width of the album cover cell." css_components="" scalar_type="number" scalar_parameters="" display_order="100" sub_group=""><![CDATA[52px]]></property>
+    <property property_name="albumListStatsWidth" property_type="scalar" definition="1" group_name="xfr_useralbums" title="Stats Cell Width" description="Controls the width of the statistics cell." css_components="" scalar_type="number" scalar_parameters="" display_order="110" sub_group=""><![CDATA[150px]]></property>
+    <property property_name="albumListCoverImage" property_type="css" definition="1" group_name="xfr_useralbums" title="Album Cover Image" description="Controls the appearance of the cover image of the album." css_components="background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="110" sub_group=""><![CDATA[{"extra":"display: block;","height":"36px","margin-bottom":"0","margin-left":"auto","margin-right":"auto","margin-top":"0","padding-all":"5px","width":"36px"}]]></property>
+    <property property_name="albumListLastImageWidth" property_type="scalar" definition="1" group_name="xfr_useralbums" title="Last Image Cell Width" description="" css_components="" scalar_type="number" scalar_parameters="" display_order="120" sub_group=""><![CDATA[135px]]></property>
+    <property property_name="albumNoCoverIconPath" property_type="scalar" definition="1" group_name="xfr_useralbums" title="Default Cover Icon Path" description="Path the the icon shown if album has no cover image." css_components="" scalar_type="" scalar_parameters="" display_order="510" sub_group=""><![CDATA[@imagePath/xfr/useralbums/album-no-cover.png]]></property>
+    <property property_name="descriptionInfo" property_type="css" definition="1" group_name="xfr_useralbums" title="Description Container" description="This element contains the content area of the album or image description." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="130" sub_group=""><![CDATA[{"border-bottom-color":"black","border-bottom-style":"none","border-bottom-width":"1px","margin-bottom":"10px","margin-left":"90px","margin-right":"0","margin-top":"0","padding-all":"0"}]]></property>
+    <property property_name="descriptionContent" property_type="css" definition="1" group_name="xfr_useralbums" title="Description Content" description="This is used to enclose the description text." css_components="text,background,border,layout,extra" scalar_type="" scalar_parameters="" display_order="140" sub_group=""><![CDATA[{"extra":"min-height: 76px;"}]]></property>
+    <property property_name="gridViewPrivate" property_type="css" definition="1" group_name="xfr_useralbums" title="Grid view: Private" description="This styles thumbnail holder for private albums in grid layout." css_components="background,border" scalar_type="" scalar_parameters="" display_order="150" sub_group=""><![CDATA[{"background-color":"@secondaryLightest","border-color":"@secondaryLighter","border-style":"solid","border-width":"1px"}]]></property>
+    <property property_name="gridViewModerated" property_type="css" definition="1" group_name="xfr_useralbums" title="Grid view: Moderated" description="This styles thumbnail holder for moderated albums in grid layout." css_components="background,border" scalar_type="" scalar_parameters="" display_order="160" sub_group=""><![CDATA[{"background-color":"#ffeae5","border-color":"#f9c5b0","border-style":"solid","border-width":"1px"}]]></property>
+    <group group_name="xfr_useralbums" display_order="2000">
+      <title>[xfr] User Albums</title>
+      <description>Styles different elements of user albums pages</description>
+    </group>
+  </style_properties>
+  <templates>
+    <template title="news_feed_item_xfr_useralbum_image_cmnt_insert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[<h3 class="description">{xen:phrase xfr_useralbums_news_feed_item_comment_insert, 'username={xen:helper username, $user, 'primaryText'}', 'album=<a href="{xen:link useralbums/image-comments, $content}">{xen:string censor, $content.title}</a>'}</h3>
+
+<p class="snippet post">{xen:helper snippet, $content.message, 100, {xen:array 'stripQuote=1'}}</p>]]></template>
+    <template title="news_feed_item_xfr_useralbum_image_insert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[<h3 class="description">{xen:phrase xfr_useralbums_news_feed_item_image_insert, 'username={xen:helper username, $user, 'primaryText'}', 'newImages={$extra.newImages}', 'album=<a href="{xen:link useralbums/view, $content}">{xen:string censor, $content.title}</a>'}</h3>
+<p class="snippet post">{xen:helper snippet, $content.description, 100}</p>]]></template>
+    <template title="news_feed_item_xfr_useralbum_insert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[<p class="description">{xen:phrase xfr_useralbums_news_feed_item_album_create, 'username={xen:helper username, $user, 'primaryText'}'}</p>
+
+<h3 class="title thread"><a href="{xen:link useralbums/view, $content}">{xen:string censor, $content.title}</a></h3>
+
+<p class="snippet post">{xen:helper snippet, $content.description, 100}</p>]]></template>
+    <template title="news_feed_item_xfr_useralbum_like" version_id="1000034" version_string="1.0.0 b4"><![CDATA[<h3 class="description">
+
+	<xen:if is="{$content.user_id} == {$visitor.user_id}">
+	
+		<xen:comment><!-- $user liked your album --></xen:comment>
+		{xen:phrase xfr_useralbums_x_liked_your_album_y,
+			'name={xen:helper username, $user, 'primaryText'}',
+			'title=<a href="{xen:link useralbums/view, $content}">{$content.title}</a>'}
+		
+	<xen:else />
+	
+		<xen:comment><!-- $user liked $contentUser's album --></xen:comment>
+		{xen:phrase xfr_useralbums_x_liked_ys_album__z,
+			'name={xen:helper username, $user, 'primaryText'}',
+			'posterParams=href="{xen:link useralbums/view, $content}"', 'poster={$content.username}',
+			'title=<a href="{xen:link useralbums/view, $content}">{$content.title}</a>'}
+		
+	</xen:if>
+
+</h3>
+
+<p class="snippet">{xen:helper snippet, $content.message, 100, {xen:array 'stripQuote=1'}}</p>]]></template>
+    <template title="xfr_useralbums_add_images" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_add_delete_images}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_add_delete_images}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/save-images', $album}" method="post"
+	class="xenForm AutoValidator"
+	data-redirect="on"
+>
+	<fieldset>
+
+		<dl class="ctrlUnit">
+			<dt></dt>
+			<dd><xen:include template="xfr_useralbums_image_upload_button" /></dd>
+		</dl>
+
+		<xen:if is="{$imageParams}">
+			<dl class="ctrlUnit AttachedFilesUnit">
+				<dt><label for="ctrl_uploader">{xen:phrase xfr_useralbums_uploaded_images}:</label></dt>
+				<dd><xen:include template="xfr_useralbums_image_editor" /></dd>
+			</dl>
+		</xen:if>
+	</fieldset>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase save}" accesskey="s" class="button primary" />
+		</dd>
+	</dl>
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_albums_list" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_album_list.css" />
+<xen:title>{xen:phrase xfr_useralbums_user_albums}</xen:title>
+
+<xen:if is="{$canCreateAlbum}">
+	<xen:topctrl>
+		<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+	</xen:topctrl>
+</xen:if>
+
+<div class="pageNavLinkGroup">
+	<xen:pagenav link="useralbums" linkdata="" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>
+
+<div class="albumList section sectionMain">
+
+<xen:if is="{$albums}">
+	<xen:include template="xfr_useralbums_album_list_holder" />
+<xen:else />
+	{xen:phrase xfr_useralbums_there_are_no_albums_yet}
+</xen:if>
+</div>
+
+<xen:sidebar>
+	<xen:if is="{$recentComments}">
+		<div class="section UserAlbumsSidebar UserAlbumsSidebarComments">
+			<div class="secondaryContent">
+				<h3>{xen:phrase xfr_useralbums_recent_comments}</h3>
+
+				<ol class="UserAlbumsRecentEntryCommentList">
+					<xen:foreach loop="$recentComments" value="$recentComment">
+						<xen:include template="xfr_useralbums_index_recent_comment" />
+					</xen:foreach>
+				</ol>
+			</div>
+		</div>
+	</xen:if>
+
+    <xen:include template="xfr_useralbums_sidebar_popular_albums" />
+
+    <xen:include template="xfr_useralbums_sidebar_most_active_members" />
+
+	<div class="section UserAlbumsSidebar UserAlbumsSidebarStats">
+		<div class="secondaryContent">
+			<h3>{xen:phrase xfr_useralbums_statistics}</h3>
+
+			<div class="pairsJustified">
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_albums}</dt>
+					<dd>{xen:number $stats.albumsCount}</dd>
+				</dl>
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_images}</dt>
+					<dd>{xen:number $stats.imagesCount}</dd>
+				</dl>
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_comments}</dt>
+					<dd>{xen:number $stats.commentsCount}</dd>
+				</dl>
+				<dl><dt>{xen:phrase xfr_useralbums_stats_album_owners}</dt>
+					<dd>{xen:number $stats.albumOwners}</dd></dl>
+			</div>
+		</div>
+	</div>
+
+	<xen:include template="sidebar_share_page">
+		<xen:set var="$url">{xen:link 'canonical:useralbums'}</xen:set>
+	</xen:include>
+</xen:sidebar>
+
+<div class="pageNavLinkGroup">
+	<div class="linkGroup">
+		<xen:if is="{$canCreateAlbum}">
+			<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+		<xen:else />
+			{xen:phrase xfr_useralbums_no_permission_to_create_album}
+		</xen:if>
+	</div>
+
+	<xen:pagenav link="useralbums" linkdata="" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>]]></template>
+    <template title="xfr_useralbums_albums_list_grid" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_album_list_grid.css" />
+
+<xen:title>{xen:phrase xfr_useralbums_user_albums}</xen:title>
+
+<xen:if is="{$canCreateAlbum}">
+	<xen:topctrl>
+		<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+	</xen:topctrl>
+</xen:if>
+
+<div class="pageNavLinkGroup">
+	<xen:pagenav link="useralbums" linkdata="" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>
+
+<div class="albumList section sectionMain">
+	
+<xen:if is="{$albums}">
+	<xen:include template="xfr_useralbums_album_list_grid_holder" />
+<xen:else />
+	{xen:phrase xfr_useralbums_there_are_no_albums_yet}
+</xen:if>
+</div>
+
+<xen:sidebar>
+	<xen:if is="{$recentComments}">
+		<div class="section UserAlbumsSidebar UserAlbumsSidebarComments">
+			<div class="secondaryContent">
+				<h3>{xen:phrase xfr_useralbums_recent_comments}</h3>
+				
+				<ol class="UserAlbumsRecentEntryCommentList">
+					<xen:foreach loop="$recentComments" value="$recentComment">
+						<xen:include template="xfr_useralbums_index_recent_comment" />
+					</xen:foreach>
+				</ol>
+			</div>
+		</div>
+	</xen:if>
+
+    <xen:include template="xfr_useralbums_sidebar_popular_albums" />
+
+    <xen:include template="xfr_useralbums_sidebar_most_active_members" />
+
+	<div class="section UserAlbumsSidebar UserAlbumsSidebarStats">
+		<div class="secondaryContent">
+			<h3>{xen:phrase xfr_useralbums_statistics}</h3>
+
+			<div class="pairsJustified">
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_albums}</dt>
+					<dd>{xen:number $stats.albumsCount}</dd>
+				</dl>
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_images}</dt>
+					<dd>{xen:number $stats.imagesCount}</dd>
+				</dl>
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_comments}</dt>
+					<dd>{xen:number $stats.commentsCount}</dd>
+				</dl>
+				<dl><dt>{xen:phrase xfr_useralbums_stats_album_owners}</dt>
+					<dd>{xen:number $stats.albumOwners}</dd></dl>
+			</div>
+		</div>
+	</div>
+
+	<xen:include template="sidebar_share_page">
+		<xen:set var="$url">{xen:link 'canonical:useralbums'}</xen:set>
+	</xen:include>
+</xen:sidebar>
+
+<div class="pageNavLinkGroup">
+	<div class="linkGroup">
+		<xen:if is="{$canCreateAlbum}">
+			<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+		<xen:else />
+			{xen:phrase xfr_useralbums_no_permission_to_create_album}
+		</xen:if>
+	</div>
+
+	<xen:pagenav link="useralbums" linkdata="" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>]]></template>
+    <template title="xfr_useralbums_album_fields_status" version_id="100" version_string="1.0.0"><![CDATA[<xen:if hascontent="true">
+	<dl class="ctrlUnit">
+		<dt><label>{xen:phrase xfr_useralbums_set_album_status}:</label></dt>
+		<dd>
+			<ul>
+			<xen:contentcheck>
+				<xen:if is="{$canModerateAlbums}">
+					<li>
+						<label for="ctrl_moderated"><input type="checkbox" name="moderated" value="1" id="ctrl_moderated" {xen:checked {$album.moderation}} /> {xen:phrase moderated}</label>
+						<input type="hidden" name="_set[moderated]" value="1" />
+						<p class="hint">{xen:phrase xfr_useralbums_closed_for_moderation}</p>
+					</li>
+				</xen:if>
+			</xen:contentcheck>
+			</ul>
+		</dd>
+	</dl>
+</xen:if>]]></template>
+    <template title="xfr_useralbums_album_like" version_id="1000034" version_string="1.0.0 b4"><![CDATA[<xen:title>{$album.title} - {xen:if $like, '{xen:phrase xfr_useralbums_unlike_album}', '{xen:phrase xfr_useralbums_like_album}'}</xen:title>
+<xen:h1>{xen:if $like, '{xen:phrase xfr_useralbums_unlike_album}', '{xen:phrase xfr_useralbums_like_album}'}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/like-album', $album}" method="post" class="xenForm">
+
+	<dl class="ctrlUnit fullWidth surplusLabel">
+		<dt></dt>
+		<dd>
+			<xen:if is="{$like}">
+				{xen:phrase xfr_useralbums_you_sure_you_want_to_unlike_this_album}
+			<xen:else />
+				{xen:phrase xfr_useralbums_you_sure_you_want_to_like_this_album}
+			</xen:if>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:if $like, '{xen:phrase xfr_useralbums_unlike_album}', '{xen:phrase xfr_useralbums_like_album}'}" accesskey="s" class="button primary" autofocus="true" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_album_likes" version_id="1000034" version_string="1.0.0 b4"><![CDATA[<xen:title>{$album.title} - {xen:phrase xfr_useralbums_members_who_liked_this_album}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_members_who_liked_this_album}</xen:h1>
+
+<xen:container var="$head.noindex">
+	<meta name="robots" content="noindex" />
+</xen:container>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<div class="section">
+	<dl class="subHeading pairsInline"><dt>{xen:phrase xfr_useralbums_album}:</dt> <dd><a href="{xen:link useralbums/view, $album}">{$album.title}</a></dd></dl>
+	<ol class="overlayScroll">
+	<xen:foreach loop="$likes" value="$like">
+		<xen:include template="member_list_item">
+			<xen:set var="$extraTemplate"><xen:datetime time="$like.like_date" /></xen:set>
+			<xen:map from="$like" to="$user" />
+		</xen:include>
+	</xen:foreach>
+	</ol>
+	<div class="sectionFooter overlayOnly"><a class="button primary OverlayCloser">{xen:phrase close}</a></div>
+</div>]]></template>
+    <template title="xfr_useralbums_album_likes_summary" version_id="1000034" version_string="1.0.0 b4"><![CDATA[<xen:if is="{$album.likes}">
+	<xen:require css="likes_summary.css" />
+	<div class="likesSummary secondaryContent">
+		<span class="LikeText">
+			<xen:likes number="$album.likes" users="$album.like_users" url="$likesUrl" liked="$album.like_date" />
+		</span>
+	</div>
+</xen:if>]]></template>
+    <template title="xfr_useralbums_album_list.css" version_id="1000033" version_string="1.0.0 b3"><![CDATA[
+.albumList
+{
+	position: relative;
+	zoom: 1;
+}
+
+/** column style and width **/
+
+.albumList .sectionHeaders,
+.albumListItem
+{
+	display: table;
+	table-layout: fixed;
+	width: 100%;
+	word-wrap: normal;
+}
+
+	.albumList .sectionHeaders dt,
+	.albumList .sectionHeaders dd,
+	.albumListItem .listBlock
+	{
+		display: table-cell;
+		vertical-align: middle;
+	}
+
+		.albumList .albumCover
+		{
+			width: {xen:property albumListCoverWidth};
+		}
+
+		.albumList .main
+		{
+			width: auto;
+		}
+
+			.albumList .sectionHeaders .main .postDate
+			{
+				text-align: right;
+			}
+
+		.albumList .stats
+		{
+			width: {xen:property albumListStatsWidth};
+		}
+
+		.albumList .lastImage
+		{
+			width: {xen:property albumListLastImageWidth};
+			text-align: right;
+			overflow: hidden;
+		}
+
+		.albumList .statsLastImage /* combined last two columns */
+		{
+			width: {xen:calc '{xen:property albumListStatsWidth} + {xen:property albumListLastImageWidth}'}px;
+		}
+
+
+/* column headers */
+
+.albumList .sectionHeaders
+{
+	{xen:property subHeading}
+
+	padding: 0;
+}
+
+	.albumList .sectionHeaders dt span
+	{
+		visibility: hidden;
+	}
+
+	.albumList .sectionHeaders a
+	{
+		display: block;
+		color: {xen:property subHeading.color};
+		outline: none;
+	}
+
+	.albumList .sectionHeaders a:hover
+	{
+		text-decoration: none;
+	}
+
+	.albumList .sectionHeaders dd a[href]:hover
+	{
+		{xen:property subHeadingHover}
+	}
+
+	.albumList .sectionHeaders .main span
+	{
+		float: left;
+		width: 100%
+	}
+	.albumList .sectionHeaders .stats span
+	{
+		float: left;
+		width: 50%;
+	}
+
+		.albumList .sectionHeaders span
+		{
+			display: block;
+			padding: {xen:property subHeading.padding-top} {xen:property subHeading.padding-bottom};
+		}
+
+/** IE <8 **/
+.albumList .sectionHeaders,
+.albumListItem                { *display: block; _vertical-align: bottom; }
+.albumList .sectionHeaders dt,
+.albumList .sectionHeaders dd,
+.albumListItem .listBlock     { *display: block; *float: left; }
+.albumListItem .listBlock     { _height: 52px; *min-height: 52px; } /* todo: should be calculation */
+.albumList .albumCover      { *width: 6.98%; }
+.albumListItem .albumCover  { *font-size: 0; }
+.albumList .main              { *width: 56.98%; }
+.albumList .stats             { *width: 15.97%; }
+.albumList .lastImage          { *width: 19.97%; }
+.albumList .statsLastPost     { *width: 35.97%; }
+.albumList .sectionHeaders dt,
+.albumList .sectionHeaders dd { *padding: 5px 0; }
+.albumList .sectionHeaders span { *display: inline !important; *float: none !important; }
+
+/* items in album list */
+
+.albumListItems
+{
+}
+
+
+
+
+/* individual album list item */
+
+/** main **/
+
+.albumListItem
+{
+	{xen:property primaryContent.background}
+
+	{xen:property primaryContent.border}
+}
+
+
+
+
+
+	/* sections, section widths */
+
+		.albumListItem .albumCover,
+		.albumListItem .stats
+		{
+			{xen:property secondaryContent.background}
+		}
+
+		.albumListItem .main,
+		.albumListItem .lastImage
+		{
+		}
+
+
+
+
+
+
+
+
+	/* avatar section */
+
+	.albumListItem .albumCover .coverContainer
+	{
+		display: block;
+		position: relative;
+	}
+
+	.albumListItem .albumCover .coverIcon
+	{
+		{xen:property albumListCoverImage}
+	}
+
+		.albumListItem .albumCover .coverIcon img
+		{
+			width: {xen:property albumListCoverImage.width};
+			height: {xen:property albumListCoverImage.height};
+			display: block;
+		}
+
+		.albumListItem .albumCover .coverIcon .noCover
+		{
+			background-image: url({xen:property albumNoCoverIconPath});
+			width: {xen:property albumListCoverImage.width};
+			height: {xen:property albumListCoverImage.height};
+			display: block;
+		}
+
+
+
+
+		.albumListItem .albumCover .miniMe
+		{
+			{xen:property discussionListMiniMe}
+		}
+
+			.albumListItem .albumCover .miniMe img
+			{
+				{xen:property discussionListMiniMeImg}
+			}
+
+
+	/* title, poster section */
+
+	.albumListItem .titleText
+	{
+		padding: 5px;
+		overflow: hidden; zoom: 1;
+		position: relative;
+	}
+
+		/* unread indicator */
+
+		.LoggedIn .albumListItem .titleText
+		{
+			padding-left: 20px;
+		}
+
+		.LoggedIn .albumListItem .unreadLink
+		{
+			display: block;
+			width: 10px;
+			height: 10px;
+
+			position: absolute;
+			left: 5px;
+			top: 10px;
+
+			background: url('{xen:property imagePath}/xenforo/widgets/unread.png') no-repeat -5px -10px;
+		}
+
+		/* first row */
+
+		.albumListItem .title
+		{
+			{xen:property discussionListFirstRow}
+			float: left;
+		}
+
+			.albumListItems .unread .title a
+			{
+				{xen:property discussionListTitleUnread}
+			}
+
+
+		.albumListItem .iconKey span
+		{
+			{xen:property dicussionListIcon}
+		}
+
+			.albumListItem .iconKey .sticky    { background-image: url('{xen:property imagePath}/xenforo/icons/sticky.png'); }
+			.albumListItem .iconKey .locked    { background-image: url('{xen:property imagePath}/xenforo/icons/locked.png'); }
+			.albumListItem .iconKey .moderated { background-image: url('{xen:property imagePath}/xenforo/icons/moderated.png'); }
+			.albumListItem .iconKey .redirect  { background-image: url('{xen:property imagePath}/xenforo/icons/redirect.png'); }
+			.albumListItem .iconKey .new       { background-image: url('{xen:property imagePath}/xenforo/widgets/discussion-new.png'); }
+
+		/* second row */
+
+		.albumListItem .secondRow
+		{
+			{xen:property discussionListSecondRow}
+			clear: both;
+		}
+
+			.albumListItem .secondRow .controls
+			{
+				float: right;
+				padding-left: 20px;
+			}
+
+				.albumListItem.AjaxProgress .controls
+				{
+					background: transparent url('{xen:property imagePath}/xenforo/widgets/ajaxload.info_B4B4DC_facebook.gif') no-repeat left center;
+				}
+
+			.albumListItem .posterDate
+			{
+				float: left;
+			}
+
+
+
+	/* stats section */
+
+	.albumListItem .stats dl
+	{
+		padding: 0 10px;
+		border-left: 1px solid {xen:property primaryLighterStill};
+		border-right: 1px solid {xen:property primaryLighterStill};
+	}
+		.albumListItem .stats .major
+		{
+			{xen:property discussionListFirstRow};
+
+			margin-top: 5px;
+		}
+
+		.albumListItem .stats .minor
+		{
+			{xen:property discussionListSecondRow};
+
+			margin-bottom: 5px;
+		}
+
+	/* last post section */
+
+	.albumListItem .lastImageInfo
+	{
+		padding: 5px;
+	}
+
+		.albumListItem .lastImageInfo .username
+		{
+			{xen:property discussionListFirstRow};
+		}
+
+
+			.albumListItems .unread .lastImageInfo .username
+			{
+				{xen:property discussionListTitleUnread}
+			}
+
+		.albumListItem .lastImageInfo .dateTime
+		{
+			{xen:property discussionListSecondRow}
+		}
+
+
+/* extra note row */
+
+.albumListItem .noteRow
+{
+	{xen:property primaryContent.background}
+	padding: 5px;
+	text-align: center;
+	font-size: 11px;
+	color: {xen:property primaryMedium};
+}
+
+
+
+
+/* deleted item */
+
+.albumList .albumListItem.deleted
+{
+}
+
+	.albumList .albumListItem.deleted .avatar img
+	{
+		opacity: 0.5;
+		filter: alpha(opacity='50');
+	}
+
+	.albumList .albumListItem.deleted .deletionNote
+	{
+		float: left;
+		color: rgb(150,0,0);
+	}
+
+/* moderated item */
+
+.albumList .albumListItem.moderated .listBlock
+{
+	{xen:property primaryContent.background}
+}
+
+
+
+/* inline mod selected/checked classes */
+
+.albumListItem.InlineModChecked,
+.albumListItem.InlineModChecked .posterAvatar,
+.albumListItem.InlineModChecked .main,
+.albumListItem.InlineModChecked .stats,
+.albumListItem.InlineModChecked .lastImage,
+.albumListItem.deleted.InlineModChecked,
+.albumListItem.moderated.InlineModChecked
+{
+	{xen:property inlineModChecked}
+}
+
+
+/** bottom summary **/
+
+.albumList .sectionFooter
+{
+	overflow: hidden; zoom: 1;
+}
+
+	.albumList .sectionFooter .contentSummary
+	{
+		float: left;
+		display: block;
+	}
+
+]]></template>
+    <template title="xfr_useralbums_album_list_grid_holder" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_list_grid.css" />
+<xen:require js="js/xfru/useralbums/sprites.js" />
+<ol class="thumbnailList">
+<xen:foreach loop="$albums" value="$album">
+	<li class="thumbnailHolder">
+		<xen:set var="$explanation"></xen:set>
+		<xen:if is="{$album.album_type} == 'private'">
+			<xen:set var="$explanation">{xen:phrase xfr_useralbums_this_is_a_private_album}</xen:set>
+		</xen:if>
+		<xen:if is="{$album.moderation}">
+			<xen:set var="$explanation">{xen:phrase xfr_useralbums_this_album_is_awaiting_moderator_approval}</xen:set>
+		</xen:if>
+		<div class="boxModelFixer primaryContent{xen:if '{$album.album_type} == "private"', ' Private'} {xen:if $album.moderation, ' Moderated'}"
+		     title="{$explanation}">
+			<div class="title Tooltip" title="{$album.title}">
+				<a href="{xen:link "full:useralbums/view", $album}">{xen:helper wordtrim, $album.title, 20}</a>
+			</div>
+
+			<xen:if hascontent="true">
+				<div class="iconKey">
+				<xen:contentcheck>
+					<xen:if is="{$album.album_type} == 'private'"><span class="locked" title="{xen:phrase xfr_useralbums_private}">{xen:phrase xfr_useralbums_private}</span></xen:if>
+					<xen:if is="{$album.moderation}"><span class="moderated" title="{xen:phrase moderated}">{xen:phrase moderated}</span></xen:if>
+				</xen:contentcheck>
+				</div>
+			</xen:if>
+
+			<div class="thumbnail">
+				<a href="{xen:link useralbums/view, $album}" class="thumbBox">
+				<xen:if is="{$album.last_image_id}">
+					<xen:if is="{$album.sprite_hash}">
+					<img src="{$album.spriteUrl}" alt="" style="display: none;">
+					</xen:if>	
+					<img class="SpriteSlider" src="{$album.image.thumbnailUrl}" alt="{$album.image.title}" data-spritehash="{$album.sprite_hash}" data-imagecount="{$album.image_count}" data-spriteurl="{$album.spriteUrl}"/>
+				<xen:else />
+					<img src="{xen:property albumNoCoverIconPath}" alt=""/>
+				</xen:if>
+				</a>
+			</div>
+
+			<div class="infobar">
+				<span class="item Tooltip images" title="{xen:phrase xfr_useralbums_album_images}">{$album.image_count}</span>
+				<span class="item Tooltip views" title="{xen:phrase xfr_useralbums_album_views}">{$album.view_count}</span>
+				<span class="item Tooltip likes" title="{xen:phrase xfr_useralbums_album_likes}">{$album.likes}</span>
+			</div>
+
+			<div class="posterDate muted">
+				
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_last_image}:</dt>
+					<dd>
+						<xen:if is="{$album.last_image_id}">
+						<a  class="faint"{xen:if '{$visitor.user_id}', ' href="{xen:link useralbums/view-image, $album.lastImageInfo}" title="{xen:phrase xfr_useralbums_go_to_last_image}"'} class="dateTime">
+							<xen:datetime time="$album.lastImageInfo.image_date" />
+						</a>
+						<xen:else />
+						{xen:phrase xfr_useralbums_last_image}: {xen:phrase n_a} <br />
+						</xen:if>
+					</dd>
+				</dl>	
+				
+				<a href="{xen:link "full:useralbums/list", $album}" title="{xen:phrase xfr_useralbums_album_owner}" class="">{$album.username}</a>,
+				<xen:datetime time="$album.createdate" class="faint" />
+			</div>
+			<xen:avatar user="$album" size="s" img="true" class="miniMe" title="{$album.username}" />
+		</div>
+	</li>
+</xen:foreach>
+</ol>]]></template>
+    <template title="xfr_useralbums_album_list_holder" version_id="100" version_string="1.0.0"><![CDATA[<dl class="sectionHeaders">
+	<dt class="albumCover"></dt>
+	<dd class="main">
+		<span>{xen:phrase title}</span>
+	</dd>
+	<dd class="stats">
+		<span>{xen:phrase xfr_useralbums_stats}</span>
+	</dd>
+	<dd class="lastImage"><span>{xen:phrase xfr_useralbums_last_image}</span></dd>
+</dl>
+
+<ol class="albumListItems">
+	<xen:set var="$showLastPageNumbers">1</xen:set>
+
+	<xen:foreach loop="$albums" value="$album">
+		<xen:include template="xfr_useralbums_album_list_item" />
+	</xen:foreach>
+</ol>
+
+<xen:include template="preview_tooltip" />]]></template>
+    <template title="xfr_useralbums_album_list_item" version_id="1000033" version_string="1.0.0 b3"><![CDATA[<xen:require css="xfr_useralbums_album_list.css" />
+
+
+<li id="album-{$album.album_id}" class="albumListItem {$album.album_type}" data-author="{$album.username}">
+
+	<div class="listBlock albumCover">
+		<span class="coverContainer">
+			<a href="{xen:link "useralbums/view", $album}" class="coverIcon">
+			<xen:if is="{$album.cover_image_id}">
+			<xen:else />
+				<img src="{xen:property albumNoCoverIconPath}" width="48" height="48" />
+			</xen:if>
+			</a>
+			<xen:avatar user="$album" size="s" img="true" class="miniMe" title="{$album.username}" />
+		</span>
+	</div>
+
+	<div class="listBlock main">
+
+		<div class="titleText">
+			<h3 class="title">
+				<a href="{xen:link "useralbums/view", $album}" title="" class="{xen:if $album.hasDescription, PreviewTooltip}"
+					data-previewUrl="{xen:if $album.hasDescription, {xen:link useralbums/preview, $album}}">{xen:helper wrap, $album.title, 50}</a>
+			</h3>
+
+			<xen:if hascontent="true">
+				<div class="iconKey">
+				<xen:contentcheck>
+					<xen:if is="{$album.album_type} == 'private'"><span class="locked" title="{xen:phrase xfr_useralbums_private}">{xen:phrase xfr_useralbums_private}</span></xen:if>
+					<xen:if is="{$album.moderation}"><span class="moderated" title="{xen:phrase moderated}">{xen:phrase moderated}</span></xen:if>
+				</xen:contentcheck>
+				</div>
+			</xen:if>
+
+			<div class="secondRow">
+				<div class="posterDate muted">
+					<a href="{xen:link "full:useralbums/list", $album}" title="{xen:phrase xfr_useralbums_album_owner}" class="">{$album.username}</a>,
+					<xen:datetime time="$album.createdate" class="faint" />
+				</div>
+
+				<div class="controls faint">
+					<xen:if is="{$album.canEditAlbum}"><a href="{xen:link 'useralbums/edit', $album}" class="EditControl" data-cacheoverlay="false">{xen:phrase edit}</a></xen:if>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="listBlock stats pairsJustified">
+		<dl class="major"><dt>{xen:phrase xfr_useralbums_images}:</dt> <dd>{xen:number $album.image_count}</dd></dl>
+		<dl class="minor"><dt>{xen:phrase views}:</dt> <dd>{xen:number $album.view_count}</dd></dl>
+	</div>
+
+	<div class="listBlock lastImage">
+		<xen:if is="!{$album.last_image_date}">
+			<div class="lastImageInfo">{xen:phrase n_a}</div>
+		<xen:else />
+			<dl class="lastImageInfo">
+				<dt>{xen:helper wordtrim, $album.lastImageInfo.title, 15}</dt>
+				<dd class="muted">
+					<a{xen:if '{$visitor.user_id}', ' href="{xen:link useralbums/view-image, $album.lastImageInfo}" title="{xen:phrase xfr_useralbums_go_to_last_image}"'} class="dateTime">
+						<xen:datetime time="$album.lastImageInfo.image_date" />
+					</a>
+				</dd>
+			</dl>
+		</xen:if>
+	</div>
+
+</li>]]></template>
+    <template title="xfr_useralbums_album_list_item_preview" version_id="100" version_string="1.0.0"><![CDATA[<div class="previewTooltip">
+	<xen:avatar user="$album" size="s" />
+
+	<div class="text">
+		<blockquote class="previewText">{xen:string nl2br, {xen:helper wordtrim, $album.descriptionParsed, $xenOptions.XfRu_UA_descrPreviewLength}}</blockquote>
+
+		<div class="posterDate muted">{$album.username}, <xen:datetime time="{$album.createdate}" class="faint" /></div>
+	</div>
+</div>]]></template>
+    <template title="xfr_useralbums_album_view" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<xen:require css="xfr_useralbums_images_list.css" />
+<xen:require js="js/xfru/useralbums/imagebox.js" />
+
+<xen:title>{$album.title}</xen:title>
+<xen:h1>{$album.title}</xen:h1>
+
+<xen:description>
+	{xen:phrase xfr_useralbums_album_created_by_x_date_y,
+		'name={xen:helper username, $album}',
+		'date=<a href="{xen:link useralbums/view, $album}">{xen:datetime $album.createdate, html}</a>'}
+</xen:description>
+
+<xen:if is="{$canAddImages}">
+	<xen:topctrl>
+		<a href="{xen:link useralbums/manage-images, $album}" class="callToAction"><span>{xen:phrase xfr_useralbums_add_delete_images}</span></a>
+	</xen:topctrl>
+</xen:if>
+
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<div class="pageNavLinkGroup">
+	<div class="linkGroup SelectionCountContainer">
+		<xen:if hascontent="true">
+			<div class="Popup">
+				<a rel="Menu">{xen:phrase xfr_useralbums_album_tools}</a>
+				<div class="Menu">
+					<div class="primaryContent menuHeader"><h3>{xen:phrase xfr_useralbums_album_tools}</h3></div>
+					<ul class="secondaryContent blockLinksList">
+						<xen:contentcheck>
+							<xen:if is="{$canEditAlbum}">
+								<!-- todo: overlay edit window -->
+								<li><a href="{xen:link 'useralbums/edit', $album}" class="">{xen:phrase xfr_useralbums_edit_album}</a></li>
+							</xen:if>
+							<xen:if is="{$canDeleteAlbum}">
+								<li><a href="{xen:link 'useralbums/delete', $album}" class="OverlayTrigger">{xen:phrase xfr_useralbums_delete_album}</a></li>
+							</xen:if>
+						</xen:contentcheck>
+					</ul>
+				</div>
+			</div>
+		</xen:if>
+		<xen:if is="{$canLikeAlbum}">
+			<a href="{xen:link useralbums/like-album, $album}" class="LikeLink {xen:if $album.like_date, unlike, like}" data-container="#likes-album-{$album.album_id}"><span></span><span class="LikeLabel">{xen:if $album.like_date, {xen:phrase unlike}, {xen:phrase like}}</span></a>
+		</xen:if>
+	</div>
+</div>
+<div class="albumLikes">
+<div id="likes-album-{$album.album_id}">
+	<xen:if is="{$album.likes}">
+		<xen:include template="xfr_useralbums_album_likes_summary">
+			<xen:set var="$likesUrl">{xen:link useralbums/likes-album, $album}</xen:set>
+		</xen:include>
+	</xen:if>
+</div>
+</div>
+<xen:if hascontent="true">
+<div class="section primaryContent descriptionHolder">
+	<div>
+		<div class="descriptionUserBlock">
+			<div class="avatarHolder">
+				<xen:avatar user="$album" size="s" title="{$album.username}" class="Tooltip" />
+			</div>
+			<span class="arrow"><span></span></span>
+		</div>
+		<div class="descriptionInfo">
+			<div class="descriptionContent">
+				<article><blockquote class="messageText ugc baseHtml">
+					<xen:contentcheck>
+					{xen:raw $album.descriptionHtml}
+					</xen:contentcheck>
+				</blockquote></article>
+
+			</div>
+		</div>
+	</div>
+</div>
+</xen:if>
+
+<div class="section secondaryContent">
+<xen:if is="{$images}">
+	<xen:include template="xfr_useralbums_images_list" />
+<xen:else />
+	{xen:phrase xfr_useralbums_there_are_no_images_yet}
+</xen:if>
+</div>
+<div class="pageNavLinkGroup">
+	<div class="linkGroup SelectionCountContainer">
+		<xen:if hascontent="true">
+			<xen:contentcheck>
+			<xen:if is="{$canAddImages}">
+				<div class="viewAlbumManageImagesButton">
+					<a href="{xen:link useralbums/manage-images, $album}" class="callToAction"><span>{xen:phrase xfr_useralbums_add_delete_images}</span></a>
+				</div>
+			</xen:if>
+			</xen:contentcheck>
+		</xen:if>
+	</div>
+</div>
+<xen:if is="{$album.album_type} != 'private'">
+	<xen:include template="share_page">
+		<xen:set var="$url">{xen:link 'canonical:useralbums/view', $album}</xen:set>
+	</xen:include>
+</xen:if>]]></template>
+    <template title="xfr_useralbums_alert_preferences" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<h3 class="sectionHeader">{xen:phrase xfr_useralbums}</h3>
+<dl class="ctrlUnit">
+	<dt>{xen:phrase receive_alert_when_someone}...</dt>
+	<dd>
+		<ul>
+			<li><input type="hidden" name="alertSet[xfr_useralbum_image_cmnt_insert]" value="1" />
+				<label><input type="checkbox" value="1" name="alert[xfr_useralbum_image_cmnt_insert]" {xen:checked "!{$alertOptOuts.xfr_useralbum_image_cmnt_insert}"} /> {xen:phrase xfr_useralbums_comments_on_your_album_image}</label>
+				<p class="hint">{xen:phrase xfr_useralbums_someone_posts_a_comment_on_one_of_your_album_images}</p>
+			</li>
+
+			<li><input type="hidden" name="alertSet[xfr_useralbum_image_cmnt_reply]" value="1" />
+				<label><input type="checkbox" value="1" name="alert[xfr_useralbum_image_cmnt_reply]" {xen:checked "!{$alertOptOuts.xfr_useralbum_image_cmnt_reply}"} /> {xen:phrase xfr_useralbums_also_comments_on_a_image}</label>
+				<p class="hint">{xen:phrase xfr_useralbums_someone_comments_on_a_image_that_you_have_commented_on}</p>
+			</li>
+
+			<li><input type="hidden" name="alertSet[xfr_useralbum_image_like]" value="1" />
+				<label><input type="checkbox" value="1" name="alert[xfr_useralbum_image_like]" {xen:checked "!{$alertOptOuts.xfr_useralbum_image_like}"} /> {xen:phrase xfr_useralbums_likes_your_image}</label>
+				<p class="hint">{xen:phrase xfr_useralbums_someone_likes_your_image}</p>
+			</li>
+
+			<li><input type="hidden" name="alertSet[xfr_useralbum_album_like]" value="1" />
+				<label><input type="checkbox" value="1" name="alert[xfr_useralbum_album_like]" {xen:checked "!{$alertOptOuts.xfr_useralbum_album_like}"} /> {xen:phrase xfr_useralbums_likes_your_album}</label>
+				<p class="hint">{xen:phrase xfr_useralbums_someone_likes_your_album}</p>
+			</li>
+		</ul>
+	</dd>
+</dl>]]></template>
+    <template title="xfr_useralbums_comment_edit" version_id="1000031" version_string="1.0.0 b1"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_edit_image_comment_by_user, 'user={$comment.username}'}</xen:title>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs"/>
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/comment-save', $comment}" method="post" class="xenForm formOverlay">
+
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_message">{xen:phrase message}:</label></dt>
+		<dd><textarea name="message" id="ctrl_message" class="textCtrl Elastic" rows="2">{$comment.message}</textarea></dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase save_changes}" accesskey="s" class="button primary" />
+		</dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_comment_report" version_id="1000031" version_string="1.0.0 b1"><![CDATA[<xen:title>{$comment.title} - {xen:phrase xfr_useralbums_report_comment}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_report_comment}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/comment-report', $comment}" method="post" class="xenForm formOverlay AutoValidator">
+
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_message">{xen:phrase report_reason}:</label></dt>
+		<dd><textarea name="message" id="ctrl_message" rows="2" class="textCtrl Elastic"></textarea></dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:phrase xfr_useralbums_report_comment}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_create_album" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_create_album}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_create_album}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/insert'}" method="post" class="xenForm AutoValidator" data-redirect="on">
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_title">{xen:phrase title}:</label></dt>
+		<dd><input type="text" name="title" class="textCtrl" id="ctrl_title" data-liveTitleTemplate="{xen:phrase xfr_useralbums_create_album}: <em>%s</em>" maxlength="100" /></dd>
+	</dl>
+
+	<dl class="ctrlUnit fullWidth">
+		<dt></dt>
+		<dd>{xen:raw $editorTemplate}</dd>
+	</dl>
+
+	<dl class="ctrlUnit">
+		<dt><label>{xen:phrase xfr_useralbums_album_type}:</label></dt>
+		<dd>
+			<ul>
+				<li><label for="ctrl_album_type_public"><input type="radio" name="type" value="public" id="ctrl_album_type_public" checked="checked" /> {xen:phrase xfr_useralbums_public}</label></li>
+				<li><label for="ctrl_album_type_private"><input type="radio" name="type" value="private" id="ctrl_album_type_private" /> {xen:phrase xfr_useralbums_private}</label></li>
+                <xen:if is="{$canManageGlobalAlbums}">
+                    <li><label for="ctrl_album_type_global"><input type="radio" name="type" value="global" id="ctrl_album_type_global" {xen:checked "{$album.album_type} == 'global'"} /> {xen:phrase xfr_useralbums_global}</label></li>
+                </xen:if>
+			</ul>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:phrase xfr_useralbums_create_album}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>
+<xen:comment><xen:include template="editor" /></xen:comment>]]></template>
+    <template title="xfr_useralbums_delete_album_confirm" version_id="1000031" version_string="1.0.0 b1"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_delete_album_x, 'title={$album.title}'}</xen:title>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/delete', $album}" method="post" class="xenForm formOverlay" id="delete-album">
+
+	<dl class="ctrlUnit">
+		<dt>{xen:phrase deletion_type}:</dt>
+		<dd>
+			<ul>
+				<li><label for="ctrl_hard_delete">
+					<input type="radio" checked="checked" name="hard_delete" id="ctrl_hard_delete" value="1" /> {xen:phrase permanently_delete}</label>
+					<p class="hint">{xen:phrase selecting_this_option_will_permanently_and_irreversibly_delete_item}</p></li>
+			</ul>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase xfr_useralbums_delete_album}" class="button primary" />
+		</dd>
+	</dl>
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_delete_comment" version_id="1000031" version_string="1.0.0 b1"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_delete_comment_by_x, 'user={$album.username}'}</xen:title>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/comment-delete', $comment}" method="post" class="xenForm formOverlay" id="delete-comment">
+
+	<dl class="ctrlUnit">
+		<dt>{xen:phrase deletion_type}:</dt>
+		<dd>
+			<ul>
+				<li><label for="ctrl_hard_delete">
+					<input type="radio" checked="checked" name="hard_delete" id="ctrl_hard_delete" value="1" /> {xen:phrase permanently_delete}</label>
+					<p class="hint">{xen:phrase selecting_this_option_will_permanently_and_irreversibly_delete_item}</p></li>
+			</ul>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase xfr_useralbums_delete_comment}" class="button primary" />
+		</dd>
+	</dl>
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_delete_image_confirm" version_id="1000031" version_string="1.0.0 b1"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_delete_image_by_x, 'user={$album.username}'}</xen:title>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/delete-image-confirm', $image}" method="post" class="xenForm formOverlay" id="delete-image">
+
+	<dl class="ctrlUnit">
+		<dt>{xen:phrase deletion_type}:</dt>
+		<dd>
+			<ul>
+				<li><label for="ctrl_hard_delete">
+					<input type="radio" checked="checked" name="hard_delete" id="ctrl_hard_delete" value="1" /> {xen:phrase permanently_delete}</label>
+					<p class="hint">{xen:phrase selecting_this_option_will_permanently_and_irreversibly_delete_item}</p></li>
+			</ul>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase xfr_useralbums_delete_image}" class="button primary" />
+		</dd>
+	</dl>
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_edit_album" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_edit_album}: {$albun.title}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_edit_album}: {$albun.title}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/save', $album}" method="post" class="xenForm AutoValidator" data-redirect="on">
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_title">{xen:phrase title}:</label></dt>
+		<dd><input type="text" name="title" class="textCtrl" id="ctrl_title" value="{$album.title}" data-liveTitleTemplate="{xen:phrase xfr_useralbums_edit_album}: <em>%s</em>" maxlength="100" /></dd>
+	</dl>
+
+	<dl class="ctrlUnit fullWidth surplusLabel">
+		<dt><label for="ctrl_description">{xen:phrase description}:</label></dt>
+		<dd>{xen:raw $editorTemplate}</dd>
+	</dl>
+
+	<dl class="ctrlUnit">
+		<dt><label>{xen:phrase xfr_useralbums_album_type}:</label></dt>
+		<dd>
+			<ul>
+				<li><label for="ctrl_album_type_public"><input type="radio" name="type" value="public" id="ctrl_album_type_public" {xen:checked "{$album.album_type} =='public'"} /> {xen:phrase xfr_useralbums_public}</label></li>
+				<li><label for="ctrl_album_type_private"><input type="radio" name="type" value="private" id="ctrl_album_type_private" {xen:checked "{$album.album_type} == 'private'"} /> {xen:phrase xfr_useralbums_private}</label></li>
+                <xen:if is="{$canManageGlobalAlbums}">
+                    <li><label for="ctrl_album_type_global"><input type="radio" name="type" value="global" id="ctrl_album_type_global" {xen:checked "{$album.album_type} == 'global'"} /> {xen:phrase xfr_useralbums_global}</label></li>
+                </xen:if>
+			</ul>
+		</dd>
+	</dl>
+
+	<xen:include template="xfr_useralbums_album_fields_status" />
+	
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:phrase save}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>
+
+<xen:comment><xen:include template="editor" /></xen:comment>]]></template>
+    <template title="xfr_useralbums_forum_list_image" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require js="js/xfru/useralbums/opener.js" />
+<xen:if is="{$image.firstImage}">
+<li class="thumbnailHolder firstImage" title="{xen:phrase xfr_useralbums_image_from_album_x_by_y, 'album={xen:string censor, $image.albumTitle}', 'name={$image.username}'}">
+<xen:else />
+<li class="thumbnailHolder" title="{xen:phrase xfr_useralbums_image_from_album_x_by_y, 'album={xen:string censor, $image.albumTitle}', 'name={$image.username}'}">
+</xen:if>
+	<xen:set var="$album.title">{$image.albumTitle}</xen:set>
+	<xen:set var="$album.album_id">{$image.album_id}</xen:set>
+	<div class="boxModelFixer primaryContent">
+		<div class="thumbnail">
+			<a href="{xen:link useralbums/view-image, $image}" class="thumbBox ImageboxOpener" data-href="{xen:link 'full:useralbums/view', $album}#image-{$image.image_id}">
+				<img src="{$image.thumbnailUrl}" alt="{$image.filename}"/>
+			</a>
+		</div>
+		<div class="infobar">
+			<span class="item Tooltip comments" title="{xen:phrase xfr_useralbums_image_comments}">{$image.comment_count}</span>
+			<span class="item Tooltip views" title="{xen:phrase xfr_useralbums_image_views}">{$image.view_count}</span>
+			<span class="item Tooltip likes" title="{xen:phrase xfr_useralbums_image_likes}">{$image.likes}</span>
+			<div class="posterDate muted">
+				<a href="{xen:link "full:members", $image}" class="">{$image.username}</a><br />
+				<a href="{xen:link "full:useralbums/view-image", $image}" class=""><xen:datetime time="{$image.image_date}" class="faint" /></a>
+			</div>
+		</div>
+	</div>
+</li>]]></template>
+    <template title="xfr_useralbums_forum_list_latest_images" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<xen:if hascontent="true">
+<xen:require css="xfr_useralbums_forum_list_latest_images.css" />
+
+<div class="sectionMain imageList" id="UserAlbums_LatestImages_Before">
+	<div class="categoryStrip">
+		<div class="categoryText">
+			<h3 class="title">{xen:phrase xfr_useralbums_latest_images}</h3>
+		</div>
+	</div>
+
+	<ol class="thumbnailList">
+	<xen:contentcheck>
+		<xen:foreach loop="$images" value="$image">
+			<xen:include template="xfr_useralbums_forum_list_image" />
+		</xen:foreach>
+	</xen:contentcheck>
+	</ol>
+</div>
+</xen:if>
+]]></template>
+    <template title="xfr_useralbums_forum_list_latest_images.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.imageList .categoryStrip
+{
+	{xen:property subHeading}
+
+	{xen:property categoryStrip}
+}
+
+	.imageList .categoryStrip .title
+	{
+		{xen:property categoryStripTitle}
+	}
+
+		.imageList .categoryStrip .title a
+		{
+			color: {xen:property categoryStripTitle.color};
+		}
+
+.thumbnailList
+{
+	overflow: hidden; zoom: 1;
+}
+
+	.thumbnailHolder
+	{
+		float: left;
+		width: 33%;
+	}
+
+	.firstImage
+	{
+		margin-left: 5px;
+	}
+
+	.thumbnailHolder .boxModelFixer
+	{
+		overflow: hidden; zoom: 1;
+		margin: 5px; padding: 5px;
+		background-color: {xen:property contentBackground};
+		border: 1px solid {xen:property primaryLighterStill};
+		border-radius: 5px;
+	}
+		
+		.thumbnailHolder .thumbnail
+		{
+			margin: 5px auto 10px auto;
+			width: 130px;
+			height: 130px;
+			line-height: 125px;
+			text-align: center;
+
+			border: 1px none black;
+			border-radius: 2px;
+			box-shadow: 1px 1px 5px rgba(0,0,0, 0.5);
+		}
+
+			.thumbnailHolder .thumbnail .thumbBox
+			{
+				padding-right: 0;
+				padding-top: 0;
+				z-index: 10;
+				position: relative;
+			}
+
+
+				.thumbnailHolder .thumbnail .thumbBox img
+				{
+					max-height: 130px;
+					max-width: 130px;
+					vertical-align: middle;
+				}
+
+		.thumbnailHolder .infobar
+		{
+			font-size: 11px;
+			width: 150px;
+			margin: 15px auto 10px auto;
+			text-align: center;
+		}
+
+			.thumbnailHolder .infobar .item
+			{
+				border: 1px solid {xen:property primaryLighterStill};
+				border-radius: 5px;
+				padding:3px 3px 3px 22px !important;
+				height:16px;
+				line-height:16px;
+				display:inline-block;
+			}
+
+				.thumbnailHolder .infobar .item.images
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/images.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.views
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/views.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.likes
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/likes.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.comments
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/comments.png) no-repeat 3px 3px;
+				}
+
+			.thumbnailHolder .infobar .posterDate
+			{
+				margin-top: 10px;
+			}]]></template>
+    <template title="xfr_useralbums_forum_list_random_images" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<xen:if hascontent="true">
+<xen:require css="xfr_useralbums_forum_list_latest_images.css" />
+
+<div class="sectionMain imageList" id="UserAlbums_LatestImages_Before">
+	<div class="categoryStrip">
+		<div class="categoryText">
+			<h3 class="title">{xen:phrase xfr_useralbums_random_images}</h3>
+		</div>
+	</div>
+
+	<ol class="thumbnailList">
+	<xen:contentcheck>
+		<xen:foreach loop="$images" value="$image">
+			<xen:include template="xfr_useralbums_forum_list_image" />
+		</xen:foreach>
+	</xen:contentcheck>
+	</ol>
+</div>
+</xen:if>
+]]></template>
+    <template title="xfr_useralbums_imagebox" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require js="js/xfru/useralbums/comments.js" />
+<xen:require css="lightbox.css" />
+<xen:require css="xfr_useralbums_image_comment.css" />
+<xen:require css="xfr_useralbums_imagebox.css" />
+
+
+<div class="formOverlay" data-overlayClass="lightBox" id="LightBox" data-loadedData="">
+
+	<div class="userInfo" id="LbUpper">
+		<span class="avatar" id="LbAvatar"><img alt="" /></span>
+		
+		<div class="userText">			
+			<div class="userTextUpper">
+				<h2 id="LbUsername">{xen:phrase n_a}</h2>
+				<div class="gadgets">
+					<a id="LbNewWindow" target="_blank" title="{xen:phrase open_in_new_window}"><span>&uarr;</span></a>
+					<a class="OverlayCloser" title="{xen:phrase close}"><span>X</span></a>
+				</div>
+			</div>
+			
+			<div class="userTextLower muted">
+				<a id="LbDateTime" class="OverlayCloser">{xen:phrase n_a}</a>
+				<a id="LbContentLink" class="OverlayCloser">{xen:phrase show_in_original_location}</a>
+			</div>
+		</div>
+	</div>	
+	
+	<div class="image">
+		<div class="imageContainer">
+			<img id="LbImage" alt="" />
+			<span id="LbProgress"><span></span></span>
+
+			<div class="imageNavContainer">
+				<a class="imageNav" id="LbPrev"><span class="ctrl">&lt;</span></a>
+				<a class="imageNav" id="LbNext"><span class="ctrl">&gt;</span></a>
+			</div>
+			<div class="imageCount"><span id="LbSelectedImage">1</span>/<span id="LbTotalImages">1</span></div>
+		</div>
+
+	</div>
+
+	<div id="LbImageContent" class="primaryContent descriptionHolder"></div>
+
+	<div id="LbComments"></div>
+
+	<div class="nav" id="LbLower"></div>
+	
+	<!--<a class="close"></a>-->
+
+</div>]]></template>
+    <template title="xfr_useralbums_imagebox.css" version_id="1000036" version_string="1.0.0 b6"><![CDATA[
+#LbImageContent
+{
+	border: none;
+	padding: 10px 0 0 0;
+	color: {xen:property contentText};
+}
+
+	#LbImageContent a
+		{
+			color: {xen:property primaryMedium};
+		}
+
+	#LbImageContent .avatar
+	{
+		float: none;
+	}
+
+	#LbImageContent > div
+	{
+		width: 90%;
+		margin: 0 auto;
+	}
+
+	#LbImageContent .muted, #LbImageContent a.muted, #LbImageContent .muted a
+	{
+		color: {xen:property mutedTextColor};
+	}
+
+	#LbImageContent .UserAlbumsLikesSummary
+	{
+		padding: 5px;
+		margin-top: 10px;
+		border: 1px solid {xen:property primaryLighterStill};
+		border-radius: 5px;
+		font-size: 11px;
+	}
+
+	#LbImageContent .UserAlbumsLikesSummary .LikeText
+	{
+		float: none;
+	}
+
+#LbComments
+{
+	background-color: {xen:property contentBackground};
+	padding: 10px 0;
+}
+	#LbComments .UserAlbumsImageComments
+	{
+		width: 90%;
+		margin: 0 auto;
+	}
+		#LbComments .UserAlbumsImageComments a
+		{
+			color: {xen:property primaryMedium};
+		}
+
+		#LbComments .UserAlbumsImageComments .UserAlbumsCommentMessage
+		{
+			color: {xen:property contentText};
+			
+		}
+
+	#LbComments .muted, #LbComments a.muted, #LbComments .muted a
+	{
+		color: {xen:property mutedTextColor};
+	}
+
+	#LbComments .UserAlbumsImageComments .avatar img
+	{
+		width: 48px;
+		height: 48px;
+	}
+
+	#LbComments #ImageCommentForm
+	{
+		margin: 0 auto;
+	}
+		#LbComments #ImageCommentForm .UserAlbumsImageCommentForm
+		{
+			padding-bottom: 5px;
+		}
+
+			#LbComments #ImageCommentForm .UserAlbumsImageCommentForm .avatar img
+			{
+				width: 36px;
+				height: 36px;
+			}
+
+		#LbComments #ImageCommentForm .submit
+		{
+			text-align: center;
+			margin: 5px 0;
+		}
+
+
+	#LbComments .textHeading
+	{
+		color: {xen:property primaryLighter};
+	}
+
+	#LbComments .textCtrl
+	{
+		color: {xen:property textCtrlText};
+		background-color: {xen:property textCtrlBackground};
+	}
+
+#LbProgress
+	{
+		display: none;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -20px;
+		margin-left: -45px;
+
+		background: black;
+		border-radius: 10px;
+	}
+
+	#LbProgress span
+	{
+		display: block;
+		width: 90px;
+		height: 40px;
+		background: transparent url('{xen:property imagePath}/xenforo/widgets/ajaxload.info_FFFFFF_facebook.gif') no-repeat center center;
+	}
+]]></template>
+    <template title="xfr_useralbums_imagebox_image_comments" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<xen:if is="{$canPostComments} || {$imageComments}">
+<div class="UserAlbumsImageComments">
+	<h3 class="textHeading larger">{xen:phrase comments}</h3>
+	<xen:if is="{$canPostComments} && {$commentsOrder} == 'newest'">
+		<xen:include template="xfr_useralbums_image_add_comment_form" />
+	</xen:if>
+
+	<div class="UserAlbumsCommentList">
+	<xen:if is="{$commentsOrder} == 'newest'">
+		<div id="NewImageComments"></div>
+	</xen:if>
+		<xen:include template="xfr_useralbums_image_comment" />
+	<xen:if is="{$commentsOrder} == 'oldest'">
+		<div id="NewImageComments"></div>
+	</xen:if>
+	<xen:if is="{$canPostComments} && {$commentsOrder} == 'oldest'">
+		<xen:include template="xfr_useralbums_image_add_comment_form" />
+	</xen:if>
+	</div>
+</div>
+</xen:if>]]></template>
+    <template title="xfr_useralbums_images_list" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<ol class="thumbnailList">
+<xen:foreach loop="$images" value="$image">
+	<li class="thumbnailHolder">
+		<div class="boxModelFixer primaryContent">
+			<div class="thumbnail">
+				<a id="image-{$image.image_id}" href="{xen:link useralbums/view-image, $image}" class="xfrIbTrigger thumbBox" data-href="{xen:link useralbums/imagebox, $image}">
+					<img src="{$image.thumbnailUrl}" alt="{$image.filename}"/>
+				</a>
+			</div>
+			<div class="infobar">
+				<span class="item Tooltip comments" title="{xen:phrase xfr_useralbums_image_comments}">{$image.comment_count}</span>
+				<span class="item Tooltip views" title="{xen:phrase xfr_useralbums_image_views}">{$image.view_count}</span>
+				<span class="item Tooltip likes" title="{xen:phrase xfr_useralbums_image_likes}">{$image.likes}</span>
+			</div>
+		</div>
+	</li>
+</xen:foreach>
+</ol>]]></template>
+    <template title="xfr_useralbums_images_list.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.albumLikes .likesSummary
+	{
+		{xen:property messageLikesSummary}
+	}
+
+.CenteredText
+{
+	text-align: center;
+}
+
+	.CenteredText .pageNavHeader
+	{
+		float:none;
+	}
+
+.CenteredNav
+{
+	display:inline-block !important;
+	float:none !important;
+}
+
+.viewAlbumManageImagesButton
+{
+    margin-top: 10px;
+    text-align: right;
+}
+
+.thumbnailList
+{
+	overflow: hidden; zoom: 1;
+}
+
+	.thumbnailHolder
+	{
+		float: left;
+		width: 25%;
+	}
+	
+	.thumbnailHolder .boxModelFixer
+	{
+		overflow: hidden; zoom: 1;
+		margin: 5px; padding: 5px;				
+		background-color: {xen:property contentBackground};
+		border: 1px solid {xen:property primaryLighterStill};	
+		border-radius: 5px;	
+	}
+		
+		.thumbnailHolder .thumbnail
+		{
+			margin: 5px auto 10px auto;
+			width: 150px;
+			height: 150px;
+			line-height: 145px;
+			text-align: center;
+			display: block;
+			position: relative;
+			/*padding-bottom: 5px;*/
+
+			border: 1px none black;
+			border-radius: 2px;
+			box-shadow: 1px 1px 5px rgba(0,0,0, 0.5);
+			overflow: hidden;
+			z-index: 100;
+		}
+
+		.thumbnailHolder .thumbnail .thumbBox
+			{
+				padding-right: 0;
+				padding-top: 0;
+				z-index: 10;
+				position: relative;
+			}
+
+				.thumbnailHolder .thumbnail .thumbBox img
+				{
+					max-height: 150px;
+					max-width: 150px;
+					vertical-align: middle;
+				}
+
+	.thumbnailHolder .infobar
+	{
+		font-size: 11px;
+		width: 150px;
+		margin: 15px auto 10px auto;
+		text-align: center;
+	}
+
+		.thumbnailHolder .infobar .item
+			{
+				border: 1px solid {xen:property primaryLighterStill};
+				border-radius: 5px;
+				padding:3px 3px 3px 22px !important;
+				height:16px;
+				line-height:16px;
+				display:inline-block;
+			}
+
+				.thumbnailHolder .infobar .item.images
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/images.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.views
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/views.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.likes
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/likes.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.comments
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/comments.png) no-repeat 3px 3px;
+				}
+
+.descriptionHolder
+{
+	border-top: 1px solid {xen:property primaryLighterStill};
+}
+
+.bbCodeImage {
+    max-width: 100%;
+}
+
+.bbCodeImageFullSize
+{
+	position: absolute;
+	z-index: 50000;
+}
+
+.imageHolder {
+	text-align: center;
+}
+
+.imageHolder img{
+        max-height:600px;
+}
+
+.descriptionUserBlock
+	{
+		width: 74px;
+		float: left;
+		@property "descriptionUserBlock";
+		background: {xen:property primaryLighterStill} url('{xen:property imagePath}/xenforo/gradients/tab-selected-light.png') repeat-x bottom;
+		border: 1px solid {xen:property primaryLighterStill};
+		border-radius: 5px;
+		@property "/descriptionUserBlock";
+
+		position: relative;
+	}
+
+		.descriptionUserBlock div.avatarHolder
+		{
+			@property "descriptionAvatarHolder";
+			background-color: {xen:property primaryLightest};
+			padding: 10px;
+			border-radius: 4px;
+			@property "/descriptionAvatarHolder";
+		}
+
+			.descriptionUserBlock div.avatarHolder a
+			{
+				display: block;
+			}
+
+		.descriptionUserBlock .arrow
+		{
+			position: absolute;
+			top: 10px;
+			right: -10px;
+
+			display: block;
+			width: 0px;
+			height: 0px;
+			line-height: 0px;
+
+			border: 10px solid transparent;
+			border-left-color: {xen:property messageUserBlock.border-color};
+			border-right: none;
+
+			/* Hide from IE6 */
+			_display: none;
+		}
+
+			.descriptionUserBlock .arrow span
+			{
+				position: absolute;
+				top: -10px;
+				left: -11px;
+
+				display: block;
+				width: 0px;
+				height: 0px;
+				line-height: 0px;
+
+				border: 10px solid transparent;
+				border-left-color: {xen:property messageAvatarHolder.background-color};
+				border-right: none;
+			}
+
+.descriptionInfo
+{
+	{xen:property descriptionInfo}
+	zoom: 1;
+}
+
+.descriptionContent
+{
+	{xen:property descriptionContent}
+}
+
+.descriptionMeta
+{
+	font-size: 11px;
+	padding: 0 0 15px 0;
+}
+
+.PublicControls
+{
+	float: right;
+}
+
+.PrivateControls
+{
+	float: left;
+}
+
+	.PrivateControls .item
+	{
+		float: left;
+		margin-right: 10px;
+	}]]></template>
+    <template title="xfr_useralbums_image_add_comment_form" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<form action="{xen:link 'useralbums/image-add-comment', $image}" method="post" id="ImageCommentForm" class="xenForm AutoValidator ImageCommentForm">
+	<div class="UserAlbumsImageCommentForm">
+		<xen:avatar user="$visitor" size="s" img="true" />
+		<textarea name="message" rows="2" class="textCtrl" id="ctrl_message" placeholder="{xen:phrase xfr_useralbums_write_a_comment}..."></textarea>
+		<div class="submit"><input type="submit" value="{xen:phrase post_comment}" accesskey="s" class="button primary" /></div>
+		<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+		<input type="hidden" name="imageCommentDate" value="{$imageCommentDate}" />
+	</div>
+</form>]]></template>
+    <template title="xfr_useralbums_image_comment" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<xen:require js="js/xfru/useralbums/comments.js" />
+<xen:require css="xfr_useralbums_image_comment.css" />
+
+<ol>
+	<xen:foreach loop="$imageComments" value="$imageComment">
+		<li id="imagecomment-{$imageComment.comment_id}" class="primaryContent UserAlbumsImageComment">
+			<xen:avatar user="$imageComment" size="s" img="true" />
+			
+			<div class="UserAlbumsImageCommentInfo">
+				<div class="UserAlbumsCommentMessage">
+					<xen:username user="$imageComment" class="poster" />
+					<article><blockquote class="ugc baseHtml">{$imageComment.message}</blockquote></article>
+				</div>
+				
+				<div class="UserAlbumsImageCommentMeta">
+					<div class="PrivateControls">
+						<span class="item muted"><a href="{xen:link useralbums/image-comments, $imageComment}"><xen:datetime time="$imageComment.comment_date" /></a></span>
+						
+						<xen:if is="{$imageComment.canEditComment} AND !{$isOverlay}">
+							<span class="UserAlbumsControlLinks"><a href="{xen:link 'useralbums/comment-edit', $imageComment}" class="control item OverlayTrigger">{xen:phrase edit}</a></span>
+						</xen:if>
+						
+						<xen:if is="{$imageComment.canDeleteComment} AND !{$isOverlay}">
+							<span class="UserAlbumsControlLinks"><a href="{xen:link 'useralbums/comment-delete', $imageComment}" class="control item OverlayTrigger">{xen:phrase delete}</a></span>
+						</xen:if>
+						
+						<xen:if is="{$visitor.user_id} AND !{$isOverlay}"><a href="{xen:link 'useralbums/comment-report', $imageComment}" class="control item UserAlbumsControlLinks report OverlayTrigger" data-cacheOverlay="false">{xen:phrase report}</a></xen:if>
+					</div>
+				</div>
+			</div>
+		</li>
+	</xen:foreach>
+</ol>]]></template>
+    <template title="xfr_useralbums_image_comment.css" version_id="1000033" version_string="1.0.0 b3"><![CDATA[.UserAlbumsCommentList
+{
+	margin: 0 10px;
+}
+
+	.UserAlbumsImageComments form
+	{
+		margin: 10px;
+		width: 100%;
+	}
+
+	.UserAlbumsImageComment
+	{
+		margin: 10px 0;
+		padding: 0 0 10px;
+		overflow: hidden;
+	}
+
+		.UserAlbumsImageComment .avatar
+		{
+			float: left;
+		}
+
+	.UserAlbumsImageCommentInfo
+	{
+		margin-left: 65px;
+	}
+
+	.UserAlbumsCommentMessage
+	{
+		min-height: 35px;
+	}
+
+		.UserAlbumsCommentMessage .poster
+		{
+			font-weight: bold;
+		}
+
+		.UserAlbumsCommentMessage blockquote
+		{
+			display: inline;
+		}
+
+	.UserAlbumsImageCommentMeta
+	{
+		padding-top: 5px;
+		overflow: hidden;
+		font-size: 11px;
+		line-height: 14px;
+	}
+
+.UserAlbumsImageComments
+{
+	/*border-top: 1px solid {xen:property primaryLighterStill};*/
+}
+
+	.UserAlbumsImageCommentForm textarea
+	{
+		margin-left: 5px;
+		width: 90%;
+		vertical-align: top;
+	}
+
+		.UserAlbumsImageCommentForm .submit
+		{
+			margin-top: 5px;
+			width: 98%;
+			text-align: right;
+		}]]></template>
+    <template title="xfr_useralbums_image_content" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<div id="image-{$image.image_id}">
+		<xen:if hascontent="true">
+		<div class="descriptionUserBlock">
+			<div class="avatarHolder">
+				<xen:avatar user="$image" size="s" title="{$image.username}" class="Tooltip" />
+			</div>
+			<span class="arrow"><span></span></span>
+		</div>
+		<div class="descriptionInfo">
+			<div class="descriptionContent">
+				<article><blockquote class="messageText ugc baseHtml">
+					<xen:contentcheck>
+					{xen:raw $image.descriptionHtml}
+					</xen:contentcheck>
+				</blockquote></article>
+
+			</div>
+		</div>
+		</xen:if>
+
+		<div class="descriptionMeta">
+			<div class="PrivateControls">
+				<span class="item muted">
+					<xen:username user="$image" class="author" />,
+					<a href="{xen:link useralbums/view-image, $image}" title="{xen:phrase permalink}" class="datePermalink"><xen:datetime time="$image.image_date" /></a>
+				</span>
+
+				<xen:if is="{$visitor.user_id} AND !{$isOverlay}"><a href="{xen:link 'useralbums/report-image', $image}" class="item control report OverlayTrigger" data-cacheOverlay="false">{xen:phrase report}</a></xen:if>
+			</div>
+
+			<div class="PublicControls">
+				<xen:if is="{$canLikeImage}">
+					<a href="{xen:link useralbums/like-image, $image}" class="LikeLink {xen:if $image.like_date, unlike, like}" data-container="#likes-image-{$image.image_id}"><span></span><span class="LikeLabel">{xen:if $image.like_date, {xen:phrase unlike}, {xen:phrase like}}</span></a>
+				</xen:if>
+			</div>
+		</div>
+
+		<div id="likes-image-{$image.image_id}">
+			<xen:if is="{$image.likes}">
+				<xen:include template="xfr_useralbums_image_likes_summary">
+					<xen:set var="$likesUrl">{xen:link useralbums/likes-image, $image}</xen:set>
+				</xen:include>
+			</xen:if>
+		</div>
+
+	</div>]]></template>
+    <template title="xfr_useralbums_image_edit" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_edit_image_by_user, 'user={$album.username}'}</xen:title>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<!-- todo: preview -->
+<form action="{xen:link 'useralbums/save-image-descr', $image}" method="post"
+	class="xenForm Preview"
+">
+
+	<fieldset>
+		<dl class="ctrlUnit fullWidth surplusLabel">
+			<dt><label for="ctrl_message">{xen:phrase description}:</label></dt>
+			<dd>{xen:raw $editorTemplate}</dd>
+		</dl>
+	</fieldset>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd>
+			<input type="submit" value="{xen:phrase save_changes}" accesskey="s" class="button primary" />
+			<!-- input type="button" value="{xen:phrase preview}..." class="button PreviewButton JsOnly" / -->
+		</dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_image_editor" version_id="100" version_string="1.0.0"><![CDATA[<xen:if is="{$imageParams}">
+
+	<xen:require js="js/xenforo/attachment_editor.js" />
+	<xen:require css="attachment_editor.css" />
+
+	<div class="AttachmentEditor">
+
+		<xen:if is="{$showUploadButton}">
+			<xen:include template="xfr_useralbums_image_upload_button" />
+		</xen:if>
+
+		<div class="NoAttachments"></div>
+
+		<ol class="AttachmentList New">
+			<xen:include template="xfr_useralbums_image_editor_image">
+				<xen:set var="$isTemplate">1</xen:set>
+				<xen:set var="$image"></xen:set>
+			</xen:include>
+		</ol>
+
+		<xen:if is="{$images}">
+			<ol class="AttachmentList Existing">
+				<xen:foreach loop="$images" value="$image">
+					<xen:include template="xfr_useralbums_image_editor_image" />
+				</xen:foreach>
+			</ol>
+		</xen:if>
+
+		<input type="hidden" name="images_hash" value="{$imageParams.hash}" />
+
+		<xen:edithint template="xfr_useralbums_image_upload_overlay" />
+
+	</div>
+
+</xen:if>]]></template>
+    <template title="xfr_useralbums_image_editor_image" version_id="100" version_string="1.0.0"><![CDATA[<xen:require css="attachment_editor.css" />
+
+<li id="{xen:if $isTemplate, 'AttachedFileTemplate', 'attachment{$image.image_id}'}"
+	class="AttachedFile {xen:if '{$image.thumbnailUrl}', 'AttachedImage'} secondaryContent">
+
+	<div class="Thumbnail">
+		<xen:if is="{$image.thumbnailUrl}">
+			<a href="{xen:link useralbums/standalone, $image}" target="_blank" data-attachmentId="{$image.image_id}"><img src="{$image.thumbnailUrl}" alt="{$image.filename}" /></a>
+		<xen:else />
+			<img src="{xen:property imagePath}/xenforo/widgets/page.png" alt="{$image.filename}" />
+		</xen:if>
+	</div>
+
+	<div class="AttachmentText">
+		<div class="Filename"><a href="{xen:link useralbums/standalone, $image}" target="_blank">{$image.filename}</a></div>
+	
+		<xen:if is="{$isTemplate}">
+			<input type="button" value="{xen:phrase cancel}" class="button smallButton AttachmentCanceller" />
+			
+			<span class="ProgressMeter"><span class="ProgressGraphic">&nbsp;</span><span class="ProgressCounter">0%</span></span>
+		<xen:else />
+			<noscript>
+				<a href="{xen:link 'useralbums/delete-image', $image}" target="_blank" class="button Smallbutton">{xen:phrase delete}</a>
+			</noscript>
+
+			<xen:if is="{$image.thumbnailUrl}">
+				<div class="label">{xen:phrase description}:</div>
+			</xen:if>
+
+			<div class="controls">
+				<input type="button" value="{xen:phrase delete}" class="button smallButton AttachmentDeleter" data- href="{xen:link 'useralbums/delete-image', $image}" />
+				<xen:if is="{$image.thumbnailUrl}">
+					<!-- todo move inline style to css -->
+					<textarea rows="2" cols="" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}" style="width: 310px;">{$image.description}</textarea>
+					<!-- input type="text" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}" value="{$image.description}" maxlength="100" style="width: 330px;" / -->
+				</xen:if>
+			</div>
+		</xen:if>
+
+	</div>
+	
+</li>]]></template>
+    <template title="xfr_useralbums_image_edit_inline" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_edit_image_by_user, 'user={$album.username}'}</xen:title>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/save-image-descr-inline', $image}" method="post" class="section AutoValidator InlineMessageEditor NoAutoHeader">
+
+	<h2 class="heading overlayOnly">{xen:phrase xfr_useralbums_edit_image_by_user, 'user={$album.username}'}</h2>
+
+	<div class="secondaryContent messageContainer">{xen:raw $editorTemplate}</div>
+
+	<div class="sectionFooter">
+		<span class="buttonContainer">
+			<input type="submit" value="{xen:phrase save_changes}" accesskey="s" class="button primary" />
+			<!-- input type="submit" value="{xen:phrase more_options}..." name="more_options" class="button JsOnly" / -->
+			<input type="button" value="{xen:phrase cancel}" class="button OverlayCloser" accesskey="r" />
+		</span>
+	</div>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_image_like" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{$image.title} - {xen:if $like, '{xen:phrase xfr_useralbums_unlike_image}', '{xen:phrase xfr_useralbums_like_image}'}</xen:title>
+<xen:h1>{xen:if $like, '{xen:phrase xfr_useralbums_unlike_image}', '{xen:phrase xfr_useralbums_like_image}'}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/like-image', $image}" method="post" class="xenForm">
+
+	<dl class="ctrlUnit fullWidth surplusLabel">
+		<dt></dt>
+		<dd>
+			<xen:if is="{$like}">
+				{xen:phrase xfr_useralbums_you_sure_you_want_to_unlike_this_image}
+			<xen:else />
+				{xen:phrase xfr_useralbums_you_sure_you_want_to_like_this_image}
+			</xen:if>
+		</dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:if $like, '{xen:phrase xfr_useralbums_unlike_image}', '{xen:phrase xfr_useralbums_like_image}'}" accesskey="s" class="button primary" autofocus="true" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_image_likes" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{$album.title} - {xen:phrase xfr_useralbums_members_who_liked_this_image}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_members_who_liked_this_image}</xen:h1>
+
+<xen:container var="$head.noindex">
+	<meta name="robots" content="noindex" /></xen:container>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<div class="section">
+	<dl class="subHeading pairsInline"><dt>{xen:phrase xfr_useralbums_album}:</dt> <dd><a href="{xen:link useralbums/view, $album}">{$album.title}</a></dd></dl>
+	<ol class="overlayScroll">
+	<xen:foreach loop="$likes" value="$like">
+		<xen:include template="member_list_item">
+			<xen:set var="$extraTemplate"><xen:datetime time="$like.like_date" /></xen:set>
+			<xen:map from="$like" to="$user" />
+		</xen:include>
+	</xen:foreach>
+	</ol>
+	<div class="sectionFooter overlayOnly"><a class="button primary OverlayCloser">{xen:phrase close}</a></div>
+</div>]]></template>
+    <template title="xfr_useralbums_image_likes_summary" version_id="100" version_string="1.0.0"><![CDATA[<xen:if is="{$image.likes}">
+	<xen:require css="xfr_useralbums_likes_summary.css" />
+	<div class="UserAlbumsLikesSummary secondaryContent">
+		<span class="LikeText">
+			<xen:likes number="$image.likes" users="$image.like_users" url="$likesUrl" liked="$image.like_date" />
+		</span>
+	</div>
+</xen:if>]]></template>
+    <template title="xfr_useralbums_image_report" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{$image.title} - {xen:phrase xfr_useralbums_report_image}</xen:title>
+<xen:h1>{xen:phrase xfr_useralbums_report_image}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<form action="{xen:link 'useralbums/report-image', $image}" method="post" class="xenForm formOverlay AutoValidator">
+
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_message">{xen:phrase report_reason}:</label></dt>
+		<dd><textarea name="message" id="ctrl_message" rows="2" class="textCtrl Elastic"></textarea></dd>
+	</dl>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:phrase xfr_useralbums_report_image}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+</form>]]></template>
+    <template title="xfr_useralbums_image_upload" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase upload_attachments}</xen:title>
+
+<form action="{xen:link 'useralbums/do-upload'}" method="post" enctype="multipart/form-data" class="xenForm">
+
+	<xen:if is="{$canUpload}">
+		<dl class="ctrlUnit">
+			<dt><label>{xen:phrase upload_attachments}:</label></dt>
+			<dd><input type="file" name="upload" /></dd>
+		</dl>
+	</xen:if>
+
+	<xen:if is="{$newFiles}">
+		<dl class="ctrlUnit">
+			<dt><label>{xen:phrase new_attachments}:</label></dt>
+			<dd>
+				<ul>
+				<xen:foreach loop="$newImages" value="$image">
+					<li>
+						<a href="{xen:link useralbums/view-image, $image}">{$image.filename}</a>
+						<input type="submit" name="delete[{$image.image_id}]" value="{xen:phrase delete}" class="button" />
+					</li>
+				</xen:foreach>
+				</ul>
+			</dd>
+		</dl>
+	</xen:if>
+
+	<xen:if is="{$existingImages}">
+		<dl class="ctrlUnit">
+			<dt><label>{xen:phrase existing_attachments}:</label></dt>
+			<dd>
+				<ul>
+				<xen:foreach loop="$existingImages" value="$image">
+					<li>
+						<a href="{xen:link useralbums/view-image, $image}">{$image.filename}</a>
+						<input type="submit" name="delete[{$image.image_id}]" value="{xen:phrase delete}" class="button" />
+					</li>
+				</xen:foreach>
+				</ul>
+			</dd>
+		</dl>
+	</xen:if>
+
+	<dl class="ctrlUnit submitUnit">
+		<dt></dt>
+		<dd><input type="submit" value="{xen:phrase upload_attachments}" accesskey="s" class="button primary" /></dd>
+	</dl>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+	<input type="hidden" name="hash" value="{$hash}" />
+
+	<xen:foreach loop="$contentData" key="$dataKey" value="$dataValue">
+		<input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
+	</xen:foreach>
+</form>]]></template>
+    <template title="xfr_useralbums_image_upload_button" version_id="100" version_string="1.0.0"><![CDATA[<xen:if is="{$imageParams}">
+
+	<xen:require js="js/xenforo/attachment_editor.js" />
+	<xen:if is="{$xenOptions.XfRu_UA_swfUpload}">
+		<xen:require js="js/swfupload/swfupload.min.js" />
+	</xen:if>
+
+	<xen:require css="attachment_editor.css" />
+
+	
+	<span id="AttachmentUploader" class="buttonProxy AttachmentUploader"
+		style="display: none"
+		data-placeholder="#SWFUploadPlaceHolder"
+		data-trigger="#ctrl_uploader"
+		data-postname="upload"
+		data-maxfilesize="{$imageConstraints.size}"
+		data-maxuploads="{$imageConstraints.count}"
+		data-extensions="{xen:helper implode, $imageConstraints.extensions, ','}"
+		data-action="{xen:link 'full:useralbums/do-upload.json', '',
+			'hash={$imageParams.hash}'}"
+		data-err-110="{xen:phrase uploaded_file_is_too_large}"
+		data-err-120="{xen:phrase uploaded_file_is_empty}"
+		data-err-130="{xen:phrase uploaded_file_does_not_have_an_allowed_extension}">
+		
+		<span id="SWFUploadPlaceHolder"></span>		
+			
+		<input type="button" value="{xen:phrase upload_file}" id="ctrl_uploader"
+			class="button OverlayTrigger DisableOnSubmit"
+			data-href="{xen:link full:useralbums/upload, '', '_params={$imageParams}'}"
+			data-hider="#AttachmentUploader" />
+		<span class="HiddenInput" data-name="_xfSessionId" data-value="{$sessionId}"></span>
+		<xen:foreach loop="$imageParams.content_data" key="$dataKey" value="$dataValue"><span class="HiddenInput" data-name="content_data[{$dataKey}]" data-value="{$dataValue}"></span>
+		</xen:foreach>
+	</span>
+
+	<noscript>
+		<a href="{xen:link 'useralbums/upload', '', '_params={$imageParams}'}" class="button" target="_blank">{xen:phrase upload_file}</a>
+	</noscript>
+
+</xen:if>]]></template>
+    <template title="xfr_useralbums_image_upload_overlay" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase file_uploader}</xen:title>
+
+<xen:require css="attachment_editor.css" />
+<xen:require js="js/xenforo/attachment_editor.js" />
+
+<form action="{xen:link 'full:useralbums/do-upload'}" method="post"
+	enctype="multipart/form-data"
+	class="formOverlay AutoInlineUploader AttachmentUploadForm NoAutoHeader"
+	data-overlayClass="attachmentUploader">
+
+	<dl class="ctrlUnit">
+		<dt><label for="ctrl_upload">{xen:phrase upload_file_from_your_computer} (<span title="{xen:phrase x_bytes, 'size={xen:number $imageConstraints.size}'}">{xen:phrase max_x, "size={xen:number $imageConstraints.size, 'size'}"}</span>):</label></dt>
+		<dd id="SWFUploadContainer" data-placeholder="#SWFUploadPlaceHolder" data-trigger="#ctrl_upload">
+			<span id="SWFUploadPlaceHolder"></span>
+			<input type="file" name="upload" class="textCtrl" onchange="this.blur()" id="ctrl_upload" />
+			<input type="reset" value="{xen:phrase close}" class="OverlayCloser button smallButton" />
+		</dd>
+	</dl>
+
+	<div class="attachmentConstraints pairsRows">
+		<dl><dt>{xen:phrase accepted_file_types}:</dt> <dd><xen:foreach loop="$imageConstraints.extensions" i="$i" count="$count" value="$extension">{$extension}{xen:if '{$i} < {$count}', ', '}</xen:foreach></dd></dl>
+	</div>
+
+	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
+	<input type="hidden" name="hash" value="{$imageParams.hash}" />
+	<xen:foreach loop="$imageParams.content_data" key="$dataKey" value="$dataValue"><input type="hidden" name="content_data[{$dataKey}]" value="{$dataValue}" />
+	</xen:foreach>
+
+</form>]]></template>
+    <template title="xfr_useralbums_image_view" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<xen:require css="xfr_useralbums_images_list.css" />
+<xen:title>{$album.title}</xen:title>
+<xen:h1>{$album.title}</xen:h1>
+
+<xen:description>
+	{xen:phrase xfr_useralbums_album_created_by_x_date_y,
+		'name={xen:helper username, $album}',
+		'date=<a href="{xen:link useralbums/view, $album}">{xen:datetime $album.createdate, html}</a>'}
+</xen:description>
+
+<xen:navigation>
+	<xen:breadcrumb source="$breadCrumbs" />
+</xen:navigation>
+
+<div class="pageNavLinkGroup">
+	<xen:edithint template="page_nav.css" />
+	<div class="linkGroup SelectionCountContainer">
+		<xen:if hascontent="true">
+			<div class="Popup">
+				<a rel="Menu">{xen:phrase xfr_useralbums_image_tools}</a>
+				<div class="Menu">
+					<div class="primaryContent menuHeader"><h3>{xen:phrase xfr_useralbums_image_tools}</h3></div>
+					<ul class="secondaryContent blockLinksList">
+						<xen:contentcheck>
+							<xen:if is="{$canEditImage}">
+								<xen:require js="js/xenforo/discussion.js" />
+								<li><a class="item control edit OverlayTrigger" href="{xen:link 'useralbums/edit-image-descr', $image}"
+									data-href="{xen:link 'useralbums/edit-image-descr-inline', $image}" data-overlayOptions="{&quot;fixed&quot;:false}"
+									data-messageSelector="#image-{$image.image_id}">{xen:phrase xfr_useralbums_edit_description}</a></li>
+							</xen:if>
+							<!-- todo: unapprove image -->
+							<xen:if is="{$canUnapproveImage}">
+								<li><a href="{xen:link 'useralbums/unapprove-image', $image}" class="item control delete OverlayTrigger">{xen:phrase xfr_useralbums_unapprove_image}</a></li>
+							</xen:if>
+
+							<xen:if is="{$canDeleteImage}">
+								<li><a href="{xen:link 'useralbums/delete-image-confirm', $image}" class="item control delete OverlayTrigger">{xen:phrase xfr_useralbums_delete_image}</a></li>
+							</xen:if>
+						</xen:contentcheck>
+					</ul>
+				</div>
+			</div>
+			<a href="{xen:link useralbums/standalone, $image, 'embedded=1'}" target="_blank">{xen:phrase open_in_new_window}</a>
+		</xen:if>
+	</div>
+	<xen:if is="{$imageNeighbours.total} > 1">
+	<div class="PageNav">
+		<span class="pageNavHeader">{xen:phrase xfr_useralbums_image_x_of_y, 'current={$imageNeighbours.current}', 'total={$imageNeighbours.total}'}</span>
+		<nav>
+			<xen:if is="{$imageNeighbours.prev}">
+				<a href="{xen:link useralbums/view-image, $imageNeighbours.prev}" class="text" rel="prev">&lt; {xen:phrase xfr_useralbums_previous_image}</a>
+			</xen:if>
+
+			<xen:if is="{$imageNeighbours.next}">
+				<a href="{xen:link useralbums/view-image, $imageNeighbours.next}" class="text" rel="prev">{xen:phrase xfr_useralbums_next_image} &gt;</a>
+			</xen:if>
+		</nav>
+	</div>
+	</xen:if>
+
+</div>
+
+<div class="section secondaryContent">
+	<div class="messageContent">
+		<article><blockquote class="messageText ugc baseHtml imageHolder">
+			<img src="{xen:link useralbums/standalone, $image, 'embedded=1'}" alt="{$image.filename}" class="bbCodeImage LightBoxImage" style="" />
+		</blockquote></article>
+	</div>
+</div>
+
+<div class="pageNavLinkGroup">
+	<xen:edithint template="page_nav.css" />
+	<xen:if is="{$imageNeighbours.total} > 1">
+	<div class="PageNav CenteredText">
+		<nav>
+			<xen:if is="{$imageNeighbours.prev}">
+				<a href="{xen:link useralbums/view-image, $imageNeighbours.prev}" class="text CenteredNav" rel="prev">&lt; {xen:phrase xfr_useralbums_previous_image}</a>
+			</xen:if>
+
+			<xen:if is="{$imageNeighbours.next}">
+				<a href="{xen:link useralbums/view-image, $imageNeighbours.next}" class="text CenteredNav" rel="prev">{xen:phrase xfr_useralbums_next_image} &gt;</a>
+			</xen:if>
+		</nav>
+	</div>
+	</xen:if>
+</div>
+
+
+<div class="section primaryContent descriptionHolder">
+	<xen:include template="xfr_useralbums_image_content" />
+</div>
+
+<xen:if is="{$canPostComments} || {$imageComments}">
+<div class="UserAlbumsImageComments">
+	<h3 class="textHeading larger">{xen:phrase comments}</h3>
+	<xen:if is="{$canPostComments} && {$commentsOrder} == 'newest'">
+		<xen:include template="xfr_useralbums_image_add_comment_form" />
+	</xen:if>
+
+	<div class="UserAlbumsCommentList">
+	<xen:if is="{$commentsOrder} == 'newest'">
+		<div id="NewImageComments"></div>
+	</xen:if>
+		<xen:include template="xfr_useralbums_image_comment" />
+	<xen:if is="{$commentsOrder} == 'oldest'">
+		<div id="NewImageComments"></div>
+	</xen:if>
+	<xen:if is="{$canPostComments} && {$commentsOrder} == 'oldest'">
+		<xen:include template="xfr_useralbums_image_add_comment_form" />
+	</xen:if>
+	</div>
+</div>
+</xen:if>
+
+<xen:if is="{$album.album_type} != 'private'">
+	<xen:include template="share_page">
+		<xen:set var="$url">{xen:link 'canonical:useralbums/view-image', $image}</xen:set>
+	</xen:include>
+</xen:if>
+]]></template>
+    <template title="xfr_useralbums_index_recent_comment" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_index_recent_comment.css" />
+
+<li class="UserAlbumsRecentComment">
+	<xen:avatar user="$recentComment" size="s" img="true" />
+	
+	<div class="UserAlbumsRecentCommentInfo">
+		<div class="UserAlbumsRecentCommentTitle"><a href="{xen:link 'useralbums/image-comments', $recentComment}">{xen:helper snippet, $recentComment.message, 60}</a></div>
+		
+		<div>
+			<span class="UserAlbumsCommentUser"><xen:username user="$recentComment" />,</span>
+			<span class="UserAlbumsCommentLink"><a href="{xen:link useralbums/image-comments, $recentComment}"><xen:datetime time="$recentComment.comment_date" /></a></span>
+		</div>
+		<div>
+			<span class="UserAlbumsCommentAlbumLink"><a href="{xen:link useralbums/view, $recentComment}">{xen:string censor, $recentComment.title}</a></span>
+		</div>
+	</div>
+</li>]]></template>
+    <template title="xfr_useralbums_index_recent_comment.css" version_id="1000036" version_string="1.0.0 b6"><![CDATA[.UserAlbumsRecentComment
+{
+	padding-top: 4px;
+	min-height: 42px;
+	border-bottom: 1px solid {xen:property primaryLighterStill};
+	margin-bottom: 5px;
+}
+
+	.UserAlbumsRecentComment:first-child
+	{
+		padding-top: 0;
+	}
+	
+	.UserAlbumsRecentComment .avatar img
+	{
+		float: left; width: 32px; height: 32px;
+	}
+
+.UserAlbumsRecentCommentInfo
+{
+	margin-left: 42px;
+	padding-bottom: 5px;
+}
+
+	.UserAlbumsRecentCommentTitle
+	{
+		min-height: 24px;
+		padding-bottom: 5px;
+	}
+	
+	.UserAlbumsCommentLink a
+	{
+		color: {xen:property mutedTextColor};
+	}
+	
+	.UserAlbumsCommentUser a
+	{
+		color: {xen:property dimmedTextColor};
+	}]]></template>
+    <template title="xfr_useralbums_likes_summary.css" version_id="100" version_string="1.0.0"><![CDATA[.UserAlbumsLikesSummary
+	{
+		padding: 5px;
+		margin-top: 10px;
+		border: 1px solid {xen:property primaryLighterStill};
+		border-radius: 5px;
+overflow: hidden; zoom: 1;
+	font-size: 11px;
+	}
+
+	.LikeText
+	{
+		float: left;
+	}
+	
+	.likeInfo
+	{
+		float: right;
+	}]]></template>
+    <template title="xfr_useralbums_links" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<ul class="secondaryContent blockLinksList">
+    <li><a href="{xen:link useralbums/create}">{xen:phrase xfr_useralbums_create_own_album}</a></li>
+    <li><a href="{xen:link useralbums/own}">{xen:phrase xfr_useralbums_view_own_albums}</a></li>
+</ul>]]></template>
+    <template title="xfr_useralbums_list_grid.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.thumbnailList
+{
+	overflow: hidden; zoom: 1;
+}
+
+	.thumbnailHolder
+	{
+		float: left;
+		width: 33%;
+	}
+		.thumbnailHolder .iconKey
+		{
+			position: absolute;
+			top: 4px;
+			right: 4px;
+			z-index: 100;
+		}
+
+		.thumbnailHolder .iconKey span
+		{
+			margin-left: 3px;
+			text-indent: -10000em;
+			float: right;
+			background-repeat: no-repeat;
+			width: 16px;
+			height: 16px;
+		}
+			.thumbnailHolder .iconKey .locked    { background-image: url('{xen:property imagePath}/xenforo/icons/locked.png'); }
+			.thumbnailHolder .iconKey .moderated { background-image: url('{xen:property imagePath}/xenforo/icons/moderated.png'); }
+
+	.thumbnailHolder .boxModelFixer
+	{
+		overflow: hidden; zoom: 1;
+		margin: 0 0 5px 10px; padding: 5px;
+		background-color: {xen:property contentBackground};
+		border: 1px solid {xen:property primaryLighterStill};
+		border-radius: 5px;
+		position: relative;
+	}
+		.thumbnailHolder .boxModelFixer.Private
+		{
+			{xen:property gridViewPrivate}
+		}
+
+		.thumbnailHolder .boxModelFixer.Moderated
+		{
+			{xen:property gridViewModerated}
+		}
+
+		.thumbnailHolder .boxModelFixer .miniMe
+		{
+			right: 5px;
+			padding-right: 0;
+			padding-top: 0;
+			position: absolute;
+			z-index: 10;
+			bottom: 4px;
+		}
+
+			.thumbnailHolder .boxModelFixer .miniMe img
+			{
+				padding: 1px;
+				border: 1px none black;
+				border-radius: 2px;
+				box-shadow: 1px 1px 5px rgba(0,0,0, 0.5);
+				width: 36px;
+				height: 36px;
+			}
+
+		.thumbnailHolder .title
+		{
+			text-align: center;
+			padding-bottom: 10px;
+		}
+
+		.thumbnailHolder .thumbnail
+		{
+			margin: 0 auto 10px auto;
+			width: 150px;
+			height: 150px;
+			line-height: 145px;
+			text-align: center;
+			display: block;
+			position: relative;
+			/*padding-bottom: 5px;*/
+
+			border: 1px none black;
+			border-radius: 2px;
+			box-shadow: 1px 1px 5px rgba(0,0,0, 0.5);
+			overflow: hidden;
+			z-index: 100;
+		}
+
+			.thumbnailHolder .thumbnail .thumbBox
+			{
+				padding-right: 0;
+				padding-top: 0;
+				z-index: 10;
+				/*bottom: 4px;*/
+				position: relative;
+			}
+
+
+				.thumbnailHolder .thumbnail .thumbBox img
+				{
+					/*max-height: 150px;*/
+					max-width: 150px;
+					vertical-align: middle;
+					z-index: 3;
+				}
+
+		.thumbnailHolder .infobar
+		{
+			font-size: 11px;
+			width: 150px;
+			margin: 15px auto 10px auto;
+			text-align: center;
+		}
+
+			.thumbnailHolder .infobar .item
+			{
+				border: 1px solid {xen:property primaryLighterStill};
+				border-radius: 5px;
+				padding:3px 3px 3px 22px !important;
+				height:16px;
+				line-height:16px;
+				display:inline-block;
+			}
+
+				.thumbnailHolder .infobar .item.images
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/images.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.views
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/views.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.likes
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/likes.png) no-repeat 3px 3px;
+				}
+				.thumbnailHolder .infobar .item.comments
+				{
+					background:url({xen:property imagePath}/xfr/useralbums/comments.png) no-repeat 3px 3px;
+				}
+
+			.thumbnailHolder .boxModelFixer.Private .infobar .item
+			{
+				{xen:property gridViewPrivate}
+			}
+
+			.thumbnailHolder .boxModelFixer.Moderated .infobar .item
+			{
+				{xen:property gridViewModerated}
+			}
+
+
+
+		.thumbnailHolder .posterDate
+		{
+			font-size: 11px;
+			min-width: 195px;
+		}
+]]></template>
+    <template title="xfr_useralbums_member_albums_list" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_album_list.css" />
+<xen:title>{xen:phrase xfr_useralbums_xs_albums, 'name={$user.username}'}</xen:title>
+
+<xen:if is="{$canCreateAlbum}">
+	<xen:topctrl>
+		<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+	</xen:topctrl>
+</xen:if>
+
+<div class="pageNavLinkGroup">
+	<xen:pagenav link="useralbums/list" linkdata="{$user}" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>
+
+<div class="albumList section sectionMain">
+
+
+<xen:if is="{$albums}">
+	<xen:include template="xfr_useralbums_album_list_holder" />
+<xen:else />
+	<xen:if is="{$user.user_id} == {$visitor.user_id}">
+		<xen:if is="{$canCreateAlbum}">
+			{xen:phrase xfr_useralbums_you_have_no_albums_yet_create_one, 'link={xen:link useralbums/create}'}
+		<xen:else />
+			{xen:phrase xfr_useralbums_sorry_you_have_no_permission_to_create_album}
+		</xen:if>
+	<xen:else />
+	{xen:phrase xfr_useralbums_user_has_no_albums_yet}
+	</xen:if>
+</xen:if>
+</div>
+
+
+<xen:sidebar>
+	<div class="section UserAlbumsSidebar UserAlbumsSidebarStats">
+		<div class="secondaryContent">
+			<h3>{xen:phrase xfr_useralbums_statistics}</h3>
+
+			<div class="pairsJustified">
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_albums}</dt>
+					<dd>{xen:number $stats.albumsCount}</dd>
+				</dl>
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_images}</dt>
+					<dd>{xen:number $stats.imagesCount}</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+
+	<xen:include template="sidebar_share_page">
+		<xen:set var="$url">{xen:link 'canonical:useralbums/list', $user}</xen:set>
+	</xen:include>
+</xen:sidebar>
+
+<div class="pageNavLinkGroup">
+	<div class="linkGroup">
+		<xen:if is="{$canCreateAlbum}">
+			<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+		<xen:else />
+			{xen:phrase xfr_useralbums_no_permission_to_create_album}
+		</xen:if>
+	</div>
+	<xen:pagenav link="useralbums/list" linkdata="{$user}" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>]]></template>
+    <template title="xfr_useralbums_member_albums_list_grig" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:require css="xfr_useralbums_album_list_grid.css" />
+<xen:title>{xen:phrase xfr_useralbums_xs_albums, 'name={$user.username}'}</xen:title>
+
+<xen:if is="{$canCreateAlbum}">
+	<xen:topctrl>
+		<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+	</xen:topctrl>
+</xen:if>
+
+<div class="pageNavLinkGroup">
+	<xen:pagenav link="useralbums/list" linkdata="{$user}" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>
+
+<div class="albumList section sectionMain">
+
+
+<xen:if is="{$albums}">
+	<xen:include template="xfr_useralbums_album_list_grid_holder" />
+<xen:else />
+	<xen:if is="{$user.user_id} == {$visitor.user_id}">
+		<xen:if is="{$canCreateAlbum}">
+			{xen:phrase xfr_useralbums_you_have_no_albums_yet_create_one, 'link={xen:link useralbums/create}'}
+		<xen:else />
+			{xen:phrase xfr_useralbums_sorry_you_have_no_permission_to_create_album}
+		</xen:if>
+	<xen:else />
+	{xen:phrase xfr_useralbums_user_has_no_albums_yet}
+	</xen:if>
+</xen:if>
+</div>
+
+
+<xen:sidebar>
+	<div class="section UserAlbumsSidebar UserAlbumsSidebarStats">
+		<div class="secondaryContent">
+			<h3>{xen:phrase xfr_useralbums_statistics}</h3>
+
+			<div class="pairsJustified">
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_albums}</dt>
+					<dd>{xen:number $stats.albumsCount}</dd>
+				</dl>
+				<dl>
+					<dt>{xen:phrase xfr_useralbums_stats_images}</dt>
+					<dd>{xen:number $stats.imagesCount}</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+
+	<xen:include template="sidebar_share_page">
+		<xen:set var="$url">{xen:link 'canonical:useralbums/list', $user}</xen:set>
+	</xen:include>
+</xen:sidebar>
+
+<div class="pageNavLinkGroup">
+	<div class="linkGroup">
+		<xen:if is="{$canCreateAlbum}">
+			<a href="{xen:link useralbums/create}" class="callToAction"><span>{xen:phrase xfr_useralbums_create_own_album}</span></a>
+		<xen:else />
+			{xen:phrase xfr_useralbums_no_permission_to_create_album}
+		</xen:if>
+	</div>
+	<xen:pagenav link="useralbums/list" linkdata="{$user}" linkparams="" page="{$page}" perpage="{$albumsPerPage}" total="{$totalAlbums}" />
+</div>]]></template>
+    <template title="xfr_useralbums_member_card_link" version_id="1000033" version_string="1.0.0 b3"><![CDATA[<dt>{xen:phrase xfr_useralbums_albums_count}:</dt> <dd><a href="{$albumsLink}" class="concealed">{xen:number $albumsCount}</a></dd>]]></template>
+    <template title="xfr_useralbums_member_profile_tab" version_id="1000034" version_string="1.0.0 b4"><![CDATA[<li><a href="{xen:link 'members', $user}#useralbums">{xen:phrase xfr_useralbums}</a></li>]]></template>
+    <template title="xfr_useralbums_member_profile_tab_content" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<li id="useralbums" class="profileContent">
+	<div class="section">
+	<xen:if is="{$albums}">
+		<xen:require css="search_results.css" />
+		<ol>
+		<xen:foreach loop="$albums" value="$album">
+			<xen:include template="xfr_useralbums_search_result" />
+		</xen:foreach>
+		</ol>
+		<xen:if is="{$albums}">
+		<div class="sectionFooter">
+			<ul class="listInline bulletImplode">
+				<li><a href="{xen:link useralbums/list, $user}">{xen:phrase xfr_useralbums_show_all_albums_by_x, 'name={$user.username}'}</a></li>
+			</ul>
+		</div>
+		</xen:if>
+	<xen:else />
+		{xen:phrase xfr_useralbums_user_has_no_albums_yet}
+	</xen:if>
+	</div>
+</li>]]></template>
+    <template title="xfr_useralbums_news_feed_item_image_like" version_id="100" version_string="1.0.0"><![CDATA[<h3 class="description">
+	<xen:if is="{$content.user_id} == {$visitor.user_id}">
+		{xen:phrase xfr_useralbums_user_liked_your_image,
+			'username={xen:helper username, $user, 'primaryText'}',
+			'title=<a href="{xen:link useralbums/view-image, $content}">{$content.title}</a>'}
+	<xen:else />
+		{xen:phrase xfr_useralbums_user1_liked_user2s_image,
+			'name={xen:helper username, $user, 'primaryText'}',
+			'posterParams=href="{xen:link members, $content}"', 'poster={$content.username}',
+			'title=<a href="{xen:link useralbums/view-image, $content}">{$content.title}</a>'}
+	</xen:if>
+</h3>
+
+<p class="snippet">{xen:helper snippet, $content.message, 100, {xen:array 'stripQuote=1'}}</p>]]></template>
+    <template title="xfr_useralbums_report_comment_content" version_id="1000031" version_string="1.0.0 b1"><![CDATA[<div class="primaryContent">{xen:helper bodyText, $content.message}</div>]]></template>
+    <template title="xfr_useralbums_report_image_content" version_id="100" version_string="1.0.0"><![CDATA[<div class="primaryContent">{xen:helper bodyText, $content.description}</div>]]></template>
+    <template title="xfr_useralbums_search_result" version_id="1000035" version_string="1.0.0 b5"><![CDATA[<xen:require css="xfr_useralbums_search_result.css" />
+<li id="useralbum-{$album.album_id}" class="searchResult thread primaryContent" data-author="{$album.username}">
+
+	<div class="listBlock posterAvatar">
+		<div class="thumbnail">
+			<xen:if is="{$album.thumbnailUrl}">
+				<img src="{$album.thumbnailUrl}" alt=""/>
+			<xen:else />
+				<img src="{xen:property albumNoCoverIconPath}" alt=""/>
+			</xen:if>
+		</div>
+	</div>
+
+	<div class="listBlock main">
+		<div class="titleText">
+			<h3 class="title">{$i} <a href="{xen:link useralbums/view, $album}">{xen:helper highlight, {xen:string censor, $album.title}, $search.search_query, 'highlight'}</a></h3>
+		</div>
+
+		<div class="meta">
+			{xen:phrase xfr_useralbums_album_by}: <xen:username user="$album" />, <xen:datetime time="$album.createdate" /> ({xen:phrase xfr_useralbums_images_in_album}: {$album.image_count})
+		</div>
+
+		<blockquote class="snippet"><a href="{xen:link useralbums/view, $album}">{xen:helper snippet, $album.description, 150, {xen:array 'term={$search.search_query}', 'emClass=highlight', 'stripQuotes=1'}}</a></blockquote>
+	</div>
+
+</li>]]></template>
+    <template title="xfr_useralbums_search_result.css" version_id="1000035" version_string="1.0.0 b5"><![CDATA[.posterAvatar .thumbnail
+{
+	margin: 10px auto;
+	width: 48px;
+	height: 48px;
+	text-align: center;
+	display: block;
+	position: relative;
+	border: 1px none black;
+	border-radius: 2px;
+	box-shadow: 1px 1px 5px rgba(0,0,0, 0.5);
+	overflow: hidden;
+	float: left;
+}
+
+	.posterAvatar .thumbnail img
+	{
+		max-height: 48px;
+		max-width: 48px;
+		vertical-align: middle;
+		z-index: 3;
+	}]]></template>
+    <template title="xfr_useralbums_sidebar_latest_album" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<xen:require css="xfr_useralbums_sidebar_latest_album.css" />
+<li>
+	<div class="UserAlbumsLatestAlbum">
+		<xen:avatar user="$album" size="s" img="true" />
+
+		<div class="UserAlbumsLatestAlbumTitle"><a href="{xen:link useralbums/view, $album}">{xen:helper snippet, $album.title, 25}</a></div>
+		<div class="UserAlbumsLatestAlbumMeta">
+			<span class="UserAlbumsLatestAlbumUsername"><xen:username user="$album" />,</span>
+			<xen:datetime time="$album.createdate" />
+		</div>
+	</div>
+</li>]]></template>
+    <template title="xfr_useralbums_sidebar_latest_album.css" version_id="1000032" version_string="1.0.0 b2"><![CDATA[.UserAlbumsLatestAlbum
+{
+	padding-top: 5px;
+	min-height: 35px;
+}
+
+	.UserAlbumsLatestAlbum .avatar img
+	{
+		float: left;
+		height: 32px;
+		width: 32px;
+		clear: left;
+	}
+
+.UserAlbumsLatestAlbumTitle
+{
+	margin-top: 2px;
+	margin-left: 45px;
+	font-size: 11pt;
+}
+
+.UserAlbumsLatestAlbumMeta
+{
+	margin-left: 45px;
+	color: {xen:property mutedTextColor};
+}
+
+	.UserAlbumsLatestAlbumUsername,
+	.UserAlbumsLatestAlbumUsername a
+	{
+		color: {xen:property dimmedTextColor};
+	}]]></template>
+    <template title="xfr_useralbums_sidebar_latest_albums" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<div class="section">
+	<div class="secondaryContent">
+		<h3>{xen:phrase xfr_useralbums_sidebar_latest_albums}</h3>
+
+		<xen:if is="{$latestAlbums}">
+			<ol>
+				<xen:foreach loop="$latestAlbums" value="$album">
+					<xen:include template="xfr_useralbums_sidebar_latest_album" />
+				</xen:foreach>
+			</ol>
+		<xen:else />
+			{xen:phrase xfr_useralbums_there_are_no_albums_yet}
+		</xen:if>
+	</div>
+</div>]]></template>
+    <template title="xfr_useralbums_sidebar_most_active_members" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<xen:if hascontent="true">
+    <div class="section">
+        <div class="secondaryContent">
+            <h3>{xen:phrase xfr_useralbums_most_active_users}</h3>
+
+            <div class="pairsJustified">
+                <xen:contentcheck>
+                    <xen:foreach loop="$stats.activeMembers" value="$user">
+                        <dl>
+                            <dt><a href="{xen:link useralbums/list, $user}" class=""><span>{$user.username}</span></a></dt>
+                            <dd>{xen:number $user.albums}</dd>
+                        </dl>
+                    </xen:foreach>
+                </xen:contentcheck>
+            </div>
+        </div>
+    </div>
+</xen:if>]]></template>
+    <template title="xfr_useralbums_sidebar_popular_albums" version_id="1000036" version_string="1.0.0 b6"><![CDATA[<div class="section">
+	<div class="secondaryContent">
+		<h3>{xen:phrase xfr_useralbums_sidebar_popualr_albums}</h3>
+
+		<xen:if is="{$popularAlbums}">
+			<ol>
+				<xen:foreach loop="$popularAlbums" value="$album">
+					<xen:include template="xfr_useralbums_sidebar_latest_album" />
+				</xen:foreach>
+			</ol>
+		<xen:else />
+			{xen:phrase xfr_useralbums_there_are_no_albums_yet}
+		</xen:if>
+	</div>
+</div>]]></template>
+    <template title="xfr_useralbums_sidebar_random_albums" version_id="1000032" version_string="1.0.0 b2"><![CDATA[<div class="section">
+	<div class="secondaryContent">
+		<h3>{xen:phrase xfr_useralbums_sidebar_random_albums}</h3>
+
+		<xen:if is="{$randomAlbums}">
+			<ol>
+				<xen:foreach loop="$randomAlbums" value="$album">
+					<xen:include template="xfr_useralbums_sidebar_latest_album" />
+				</xen:foreach>
+			</ol>
+		<xen:else />
+			{xen:phrase xfr_useralbums_there_are_no_albums_yet}
+		</xen:if>
+	</div>
+</div>]]></template>
+    <template title="xfr_useralbum_image_cmnt_insert_alert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{xen:phrase xfr_useralbums_alert_image_comment,
+	'user={xen:helper username, $user, 'subject'}',
+	'link={xen:link useralbums/image-comments, $content}',
+	'title={$content.title}'}]]></template>
+    <template title="xfr_useralbum_image_cmnt_reply_alert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{xen:phrase xfr_useralbums_alert_image_comment_someone_comments,
+	'user={xen:helper username, $user, 'subject'}',
+	'link={xen:link useralbums/image-comments, $content}',
+	'title={$content.title}'}]]></template>
+    <template title="xfr_useralbum_image_like_alert" version_id="1000033" version_string="1.0.0 b3"><![CDATA[{xen:phrase xfr_useralbums_user_liked_your_image,
+	'username={xen:helper username, $user, 'subject'}',
+	'title=<a href="{xen:link useralbums/view-image, $content}">{$content.title}</a>'}]]></template>
+    <template title="xfr_useralbum_like_alert" version_id="1000034" version_string="1.0.0 b4"><![CDATA[{xen:phrase xfr_useralbums_user_liked_your_album,
+	'username={xen:helper username, $user, 'primaryText'}',
+	'title=<a href="{xen:link useralbums/view, $content}">{$content.title}</a>'}]]></template>
+  </templates>
+  <bb_code_media_sites/>
+</addon>
