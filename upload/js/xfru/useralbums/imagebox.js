@@ -51,7 +51,7 @@
 
 			if (dataSource == $lightBox.data('loadedData'))
 			{
-				console.log('Requested image is already displayed: %s.', imageSource);
+				console.log('Requested image is already displayed: %s.', dataSource);
 				return this;
 			}
 
