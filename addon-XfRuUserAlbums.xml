@@ -601,7 +601,7 @@ step=5</edit_format_params>
 </h3>
 
 <p class="snippet">{xen:helper snippet, $content.message, 100, {xen:array 'stripQuote=1'}}</p>]]></template>
-    <template title="xfr_useralbums_add_images" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_add_delete_images}</xen:title>
+    <template title="xfr_useralbums_add_images" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_add_delete_images}</xen:title>
 <xen:h1>{xen:phrase xfr_useralbums_add_delete_images}</xen:h1>
 
 <xen:navigation>
@@ -2703,7 +2703,7 @@ step=5</edit_format_params>
 
 	<input type="hidden" name="_xfToken" value="{$visitor.csrf_token_page}" />
 </form>]]></template>
-    <template title="xfr_useralbums_image_editor" version_id="100" version_string="1.0.0"><![CDATA[<xen:if is="{$imageParams}">
+    <template title="xfr_useralbums_image_editor" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:if is="{$imageParams}">
 
 	<xen:require js="js/xenforo/attachment_editor.js" />
 	<xen:require css="attachment_editor.css" />
@@ -2738,21 +2738,21 @@ step=5</edit_format_params>
 	</div>
 
 </xen:if>]]></template>
-    <template title="xfr_useralbums_image_editor_image" version_id="100" version_string="1.0.0"><![CDATA[<xen:require css="attachment_editor.css" />
+    <template title="xfr_useralbums_image_editor_image" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:require css="attachment_editor.css" />
 
 <li id="{xen:if $isTemplate, 'AttachedFileTemplate', 'attachment{$image.image_id}'}"
-	class="AttachedFile {xen:if '{$image.thumbnailUrl}', 'AttachedImage'} secondaryContent">
+	class="AttachedFile {xen:if '!{$isTemplate} && {$image.thumbnailUrl}', 'AttachedImage'} secondaryContent">
 
 	<div class="Thumbnail">
-		<xen:if is="{$image.thumbnailUrl}">
+		<xen:if is="!{$isTemplate} && {$image.thumbnailUrl}">
 			<a href="{xen:link useralbums/standalone, $image}" target="_blank" data-attachmentId="{$image.image_id}"><img src="{$image.thumbnailUrl}" alt="{$image.filename}" /></a>
 		<xen:else />
-			<img src="{xen:property imagePath}/xenforo/widgets/page.png" alt="{$image.filename}" />
+			<img src="{xen:property imagePath}/xenforo/widgets/page.png" alt="{xen:if '!{$isTemplate}', '{$image.filename}'}" />
 		</xen:if>
 	</div>
 
 	<div class="AttachmentText">
-		<div class="Filename"><a href="{xen:link useralbums/standalone, $image}" target="_blank">{$image.filename}</a></div>
+		<div class="Filename"><a href="{xen:link useralbums/standalone, $image}" target="_blank"><xen:if is="!{$isTemplate}">{$image.filename}</xen:if></a></div>
 	
 		<xen:if is="{$isTemplate}">
 			<input type="button" value="{xen:phrase cancel}" class="button smallButton AttachmentCanceller" />
@@ -2769,7 +2769,7 @@ step=5</edit_format_params>
 
 			<div class="controls">
 				<input type="button" value="{xen:phrase delete}" class="button smallButton AttachmentDeleter" data- href="{xen:link 'useralbums/delete-image', $image}" />
-				<xen:if is="{$image.thumbnailUrl}">
+				<xen:if is="!{$isTemplate} && {$image.thumbnailUrl}">
 					<!-- todo move inline style to css -->
 					<textarea rows="2" cols="" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}" style="width: 310px;">{$image.description}</textarea>
 					<!-- input type="text" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}" value="{$image.description}" maxlength="100" style="width: 330px;" / -->
