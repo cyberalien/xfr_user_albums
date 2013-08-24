@@ -608,8 +608,10 @@ step=5</edit_format_params>
 	<xen:breadcrumb source="$breadCrumbs" />
 </xen:navigation>
 
+<xen:require css="xfr_useralbums_image_editor.css" />
+
 <form action="{xen:link 'useralbums/save-images', $album}" method="post"
-	class="xenForm AutoValidator"
+	class="xenForm AutoValidator AddImages"
 	data-redirect="on"
 >
 	<fieldset>
@@ -2706,8 +2708,9 @@ step=5</edit_format_params>
 
 	<xen:require js="js/xenforo/attachment_editor.js" />
 	<xen:require css="attachment_editor.css" />
+	<xen:require css="xfr_useralbums_image_editor.css" />
 
-	<div class="AttachmentEditor">
+	<div class="AttachmentEditor ImageEditor">
 
 		<xen:if is="{$showUploadButton}">
 			<xen:include template="xfr_useralbums_image_upload_button" />
@@ -2736,6 +2739,31 @@ step=5</edit_format_params>
 
 	</div>
 
+</xen:if>]]></template>
+    <template title="xfr_useralbums_image_editor.css" version_id="1000037" version_string="1.0.0 b7"><![CDATA[.ImageEditor textarea
+{
+	width: 310px;
+}
+
+<xen:if is="{xen:property enableResponsive}">
+@media (max-width:{xen:property maxResponsiveWideWidth})
+{
+	.Responsive .AddImages .ctrlUnit > dd
+	{
+		padding-left: 0;
+		padding-right: 0;
+	}
+
+	.Responsive .ImageEditor textarea
+	{
+		width: 100%;
+	}
+
+	.Responsive .ImageEditor .AttachmentList > li.AttachedFile.secondaryContent
+	{
+		margin-right: 0;
+	}
+}
 </xen:if>]]></template>
     <template title="xfr_useralbums_image_editor_image" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:require css="attachment_editor.css" />
 
@@ -2770,7 +2798,7 @@ step=5</edit_format_params>
 				<input type="button" value="{xen:phrase delete}" class="button smallButton AttachmentDeleter" data- href="{xen:link 'useralbums/delete-image', $image}" />
 				<xen:if is="!{$isTemplate} && {$image.thumbnailUrl}">
 					<!-- todo move inline style to css -->
-					<textarea rows="2" cols="" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}" style="width: 310px;">{$image.description}</textarea>
+					<textarea rows="2" cols="" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}">{$image.description}</textarea>
 					<!-- input type="text" name="imageDescr[{$image.image_id}]" class="textCtrl" id="ctrl_imageDescr{$image.image_id}" value="{$image.description}" maxlength="100" style="width: 330px;" / -->
 				</xen:if>
 			</div>
