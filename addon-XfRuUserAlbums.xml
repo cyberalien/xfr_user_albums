@@ -2675,7 +2675,7 @@ step=5</edit_format_params>
 		</div>
 
 	</div>]]></template>
-    <template title="xfr_useralbums_image_edit" version_id="100" version_string="1.0.0"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_edit_image_by_user, 'user={$album.username}'}</xen:title>
+    <template title="xfr_useralbums_image_edit" version_id="1000037" version_string="1.0.0 b7"><![CDATA[<xen:title>{xen:phrase xfr_useralbums_edit_image_by_user, 'user={$album.username}'}</xen:title>
 
 <xen:navigation>
 	<xen:breadcrumb source="$breadCrumbs" />
@@ -2683,8 +2683,7 @@ step=5</edit_format_params>
 
 <!-- todo: preview -->
 <form action="{xen:link 'useralbums/save-image-descr', $image}" method="post"
-	class="xenForm Preview"
-">
+	class="xenForm Preview">
 
 	<fieldset>
 		<dl class="ctrlUnit fullWidth surplusLabel">
